@@ -143,6 +143,41 @@
     rebuildLiveItems();
   }
 
+  /* ============================ annotations (sticky notes / highlights) ============================ */
+  /* Separate from overrides: these don't change the underlying data, they're the digital
+     version of pen marks on the printed pages — e.g. highlighting a wine's name as
+     "bubbly", or writing "straw" under an allergen box that just says N/A. */
+
+  const ANNOTATIONS_KEY = 'racoonnoisseur-annotations-v1';
+  function loadAnnotations() {
+    try { return JSON.parse(localStorage.getItem(ANNOTATIONS_KEY)) || {}; }
+    catch (e) { return {}; }
+  }
+  function saveAnnotationsToStorage(a) { localStorage.setItem(ANNOTATIONS_KEY, JSON.stringify(a)); }
+
+  let annotations = loadAnnotations();
+
+  function getAnnotation(itemId, field) {
+    return (annotations[itemId] && annotations[itemId][field]) || null;
+  }
+
+  function setAnnotation(itemId, field, { note, highlight }) {
+    const forItem = annotations[itemId] || {};
+    if (!note && !highlight) {
+      delete forItem[field];
+    } else {
+      forItem[field] = { note: note || '', highlight: !!highlight };
+    }
+    if (Object.keys(forItem).length === 0) delete annotations[itemId];
+    else annotations[itemId] = forItem;
+    saveAnnotationsToStorage(annotations);
+  }
+
+  function clearAllAnnotations() {
+    annotations = {};
+    saveAnnotationsToStorage(annotations);
+  }
+
   /* ============================ helpers ============================ */
 
   function escapeHtml(str) {
@@ -650,7 +685,135 @@
 
   /* ============================ REFERENCE ============================ */
 
-  const refState = { search: '', category: 'all', editingId: null };
+  const refState = { search: '', category: 'all', editingId: null, mode: 'list', pageIndex: 0, editingCell: null };
+
+  function getPageGroups() {
+    const winePages = ['Wine List, p.1', 'Wine List, p.2', 'Wine List, p.3'];
+    const menuPages = Array.from({ length: 11 }, (_, i) => `Menu Knowledge, p.${i + 1}`);
+    const pages = [];
+    winePages.forEach(label => pages.push({
+      label, type: 'wine',
+      items: LIVE_ITEMS.filter(i => i.category === 'wine' && i.sourcePage === label)
+    }));
+    menuPages.forEach(label => pages.push({
+      label, type: 'menu',
+      items: LIVE_ITEMS.filter(i => (i.category === 'cocktail' || i.category === 'food') && i.sourcePage === label)
+    }));
+    pages.push({ label: 'Menu Knowledge, p.12', type: 'liquors', items: WELL_LIQUORS });
+    return pages;
+  }
+
+  function pageShortLabel(label) {
+    return label.replace('Wine List, ', 'Wine ').replace('Menu Knowledge, ', 'Menu ');
+  }
+
+  function pageCellHtml(item, field) {
+    const ann = getAnnotation(item.id, field);
+    const editingThis = refState.editingCell && refState.editingCell.id === item.id && refState.editingCell.field === field;
+    const value = field === 'name' ? item.name : (item[field] || 'N/A');
+    if (editingThis) {
+      return `
+        <td class="page-cell editing-cell" data-id="${item.id}" data-field="${field}">
+          <div class="page-cell-value">${escapeHtml(value)}</div>
+          <textarea class="search-input cell-note-input" rows="2" placeholder="Add a note...">${escapeHtml(ann ? ann.note : '')}</textarea>
+          <label class="cell-highlight-toggle"><input type="checkbox" class="cell-highlight-input" ${ann && ann.highlight ? 'checked' : ''}> Highlight this cell</label>
+          <div class="study-nav" style="margin-top:8px">
+            <button class="btn secondary" data-cell-action="cancel">Cancel</button>
+            <button class="btn" data-cell-action="save">Save</button>
+          </div>
+          ${ann ? `<button class="btn secondary block" data-cell-action="clear" style="margin-top:8px">Clear note</button>` : ''}
+        </td>
+      `;
+    }
+    return `
+      <td class="page-cell ${ann && ann.highlight ? 'highlighted' : ''}" data-id="${item.id}" data-field="${field}">
+        <div class="page-cell-value">${escapeHtml(value)}</div>
+        ${ann && ann.note ? `<div class="page-cell-note">📝 ${escapeHtml(ann.note)}</div>` : ''}
+      </td>
+    `;
+  }
+
+  function renderPageTable(page) {
+    if (page.type === 'liquors') {
+      const rows = [['spirit', 'Spirit'], ['brand', 'Brand']];
+      return `
+        <div class="page-table-wrap">
+          <table class="page-table">
+            <tbody>
+              ${rows.map(([field, label]) => `<tr><th>${label}</th>${page.items.map(item => pageCellHtml(item, field)).join('')}</tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+    if (page.items.length === 0) return '<div class="empty-state">No items landed on this page.</div>';
+    const rows = page.type === 'wine'
+      ? [['varietal', 'Varietal'], ['region', 'Region'], ['blurb', 'Flavour Profile'], ['pairings', 'Food Pairings']]
+      : [['blurb', 'Story & Flavour'], ['composition', 'Composition'], ['allergens', 'Allergens'], ['preset', 'Garnish / Preset']];
+    return `
+      <div class="page-table-wrap">
+        <table class="page-table">
+          <thead>
+            <tr><th>${page.type === 'wine' ? 'Wine' : 'Menu Item'}</th>${page.items.map(item => pageCellHtml(item, 'name')).join('')}</tr>
+          </thead>
+          <tbody>
+            ${rows.map(([field, label]) => `<tr><th>${label}</th>${page.items.map(item => pageCellHtml(item, field)).join('')}</tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  function renderReferencePagesInner() {
+    const pages = getPageGroups();
+    if (refState.pageIndex >= pages.length) refState.pageIndex = 0;
+    const page = pages[refState.pageIndex];
+    const anyAnnotations = Object.keys(annotations).length > 0;
+    return `
+      <p style="color:var(--muted);font-size:13px;margin-top:-6px">Browsed page by page, just like the printed binder. Tap any cell to highlight it or add a note.</p>
+      <div class="pill-row" id="page-selector" style="flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px">
+        ${pages.map((p, idx) => `<button class="pill ${idx === refState.pageIndex ? 'active' : ''}" data-page="${idx}" style="white-space:nowrap">${pageShortLabel(p.label)}</button>`).join('')}
+      </div>
+      <div id="page-table-area">${renderPageTable(page)}</div>
+      ${anyAnnotations ? '<button class="btn secondary block" id="clear-all-annotations" style="margin-top:12px">↺ Clear all notes &amp; highlights</button>' : ''}
+    `;
+  }
+
+  function wireReferencePagesListeners() {
+    document.getElementById('page-selector').querySelectorAll('[data-page]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        refState.pageIndex = parseInt(btn.dataset.page, 10);
+        refState.editingCell = null;
+        renderReference();
+      });
+    });
+
+    document.getElementById('page-table-area').addEventListener('click', e => {
+      const actionBtn = e.target.closest('[data-cell-action]');
+      if (actionBtn) {
+        const cell = actionBtn.closest('.page-cell');
+        const id = cell.dataset.id, field = cell.dataset.field;
+        if (actionBtn.dataset.cellAction === 'save') {
+          const note = cell.querySelector('.cell-note-input').value.trim();
+          const highlight = cell.querySelector('.cell-highlight-input').checked;
+          setAnnotation(id, field, { note, highlight });
+        } else if (actionBtn.dataset.cellAction === 'clear') {
+          setAnnotation(id, field, { note: '', highlight: false });
+        }
+        refState.editingCell = null;
+        renderReference();
+        return;
+      }
+      const cell = e.target.closest('.page-cell:not(.editing-cell)');
+      if (cell) {
+        refState.editingCell = { id: cell.dataset.id, field: cell.dataset.field };
+        renderReference();
+      }
+    });
+
+    const clearAllBtn = document.getElementById('clear-all-annotations');
+    if (clearAllBtn) clearAllBtn.addEventListener('click', () => { clearAllAnnotations(); renderReference(); });
+  }
 
   function editableFieldsFor(item) {
     if (item.category === 'wine') {
@@ -701,7 +864,7 @@
     `;
   }
 
-  function renderReference() {
+  function renderReferenceListInner() {
     const cats = [['all', 'All'], ['wine', 'Wine'], ['cocktail', 'Cocktails'], ['food', 'Food']];
     let items = refState.category === 'all' ? LIVE_ITEMS : LIVE_ITEMS.filter(i => i.category === refState.category);
     if (refState.search.trim()) {
@@ -709,11 +872,8 @@
       items = items.filter(i => [i.name, i.composition, i.blurb, i.varietal, i.region, i.pairings, i.allergens]
         .filter(Boolean).some(f => f.toLowerCase().includes(q)));
     }
-
     const anyEdits = Object.keys(overrides).length > 0;
-
-    root.innerHTML = `
-      <div class="section-title">Reference</div>
+    return `
       <p style="color:var(--muted);font-size:13px;margin-top:-6px">Spot a scan error? Tap "Fix a detail" on any item — the correction applies everywhere in the app.</p>
       <input class="search-input" id="ref-search" placeholder="Search name, ingredient, allergen..." value="${escapeHtml(refState.search)}">
       <div class="pill-row" id="ref-cats">
@@ -725,7 +885,9 @@
       </div>
       ${anyEdits ? '<button class="btn secondary block" id="reset-all-edits" style="margin-top:6px">↺ Reset all corrections</button>' : ''}
     `;
+  }
 
+  function wireReferenceListListeners() {
     const searchInput = document.getElementById('ref-search');
     searchInput.addEventListener('input', () => {
       refState.search = searchInput.value;
@@ -764,6 +926,29 @@
 
     const resetAllBtn = document.getElementById('reset-all-edits');
     if (resetAllBtn) resetAllBtn.addEventListener('click', () => { resetAllOverrides(); renderReference(); });
+  }
+
+  function renderReference() {
+    root.innerHTML = `
+      <div class="section-title">Reference</div>
+      <div class="pill-row" id="ref-mode-toggle">
+        <button class="pill ${refState.mode === 'list' ? 'active' : ''}" data-mode="list">📋 List</button>
+        <button class="pill ${refState.mode === 'pages' ? 'active' : ''}" data-mode="pages">📄 Pages</button>
+      </div>
+      <div id="ref-body">${refState.mode === 'pages' ? renderReferencePagesInner() : renderReferenceListInner()}</div>
+    `;
+
+    document.getElementById('ref-mode-toggle').querySelectorAll('[data-mode]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (refState.mode === btn.dataset.mode) return;
+        refState.mode = btn.dataset.mode;
+        refState.editingCell = null;
+        renderReference();
+      });
+    });
+
+    if (refState.mode === 'pages') wireReferencePagesListeners();
+    else wireReferenceListListeners();
   }
 
   /* ============================ init ============================ */

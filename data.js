@@ -519,11 +519,11 @@ const COCKTAILS = [
 ];
 
 const WELL_LIQUORS = [
-  { spirit: 'Vodka', brand: 'Easy Vodka / Snake Lake' },
-  { spirit: 'Rum', brand: 'Diplomatico White Rum' },
-  { spirit: 'Gin', brand: 'Anohka' },
-  { spirit: 'Tequila', brand: 'Cimmaron Blanco (premium upgrade: Cimmaron Reposado)' },
-  { spirit: 'Rye/Whiskey', brand: 'Reifel Rye' }
+  { id: 'liquor-vodka', spirit: 'Vodka', brand: 'Easy Vodka / Snake Lake' },
+  { id: 'liquor-rum', spirit: 'Rum', brand: 'Diplomatico White Rum' },
+  { id: 'liquor-gin', spirit: 'Gin', brand: 'Anohka' },
+  { id: 'liquor-tequila', spirit: 'Tequila', brand: 'Cimmaron Blanco (premium upgrade: Cimmaron Reposado)' },
+  { id: 'liquor-rye', spirit: 'Rye/Whiskey', brand: 'Reifel Rye' }
 ];
 
 const FOOD = [
