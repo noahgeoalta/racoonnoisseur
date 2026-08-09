@@ -9,6 +9,7 @@
 const WINES = [
   {
     id: 'wine-sette-roche',
+    sourcePage: 'Wine List, p.1',
     name: "Sette Roche Vino Spumante Extra Dry",
     category: 'wine', subcategory: 'sparkling',
     varietal: 'Glera & Italian white blend',
@@ -19,6 +20,7 @@ const WINES = [
   },
   {
     id: 'wine-cantina-soliera',
+    sourcePage: 'Wine List, p.1',
     name: 'Cantina di Soliera Lambrusco Salamino',
     category: 'wine', subcategory: 'sparkling',
     varietal: 'Lambrusco, Salamino (Semi-Dry)',
@@ -29,6 +31,7 @@ const WINES = [
   },
   {
     id: 'wine-muralhas-rose',
+    sourcePage: 'Wine List, p.1',
     name: 'Muralhas de Monção "Muralhas Rosé"',
     category: 'wine', subcategory: 'rose',
     varietal: 'Alvarelhão & Pedral',
@@ -39,6 +42,7 @@ const WINES = [
   },
   {
     id: 'wine-sandro-de-bruno',
+    sourcePage: 'Wine List, p.1',
     name: 'Sandro De Bruno Pinot Grigio "Grigio Ramato"',
     category: 'wine', subcategory: 'white',
     varietal: 'Pinot Grigio (skin-contact / orange wine)',
@@ -49,6 +53,7 @@ const WINES = [
   },
   {
     id: 'wine-cantina-levorato',
+    sourcePage: 'Wine List, p.1',
     name: 'Cantina Levorato Pinot Grigio',
     category: 'wine', subcategory: 'white',
     varietal: 'Pinot Grigio',
@@ -59,6 +64,7 @@ const WINES = [
   },
   {
     id: 'wine-nuestro-verdejo',
+    sourcePage: 'Wine List, p.1',
     name: 'Nuestro Verdejo',
     category: 'wine', subcategory: 'white',
     varietal: 'Verdejo',
@@ -69,6 +75,7 @@ const WINES = [
   },
   {
     id: 'wine-jackson-estate',
+    sourcePage: 'Wine List, p.1',
     name: 'Jackson Estate "Stitch" Sauvignon Blanc',
     category: 'wine', subcategory: 'white',
     varietal: 'Sauvignon Blanc',
@@ -79,6 +86,7 @@ const WINES = [
   },
   {
     id: 'wine-lafazanis-geometria',
+    sourcePage: 'Wine List, p.1',
     name: 'Lafazanis "Geometria" Sauvignon Blanc',
     category: 'wine', subcategory: 'white',
     varietal: 'Sauvignon Blanc',
@@ -89,6 +97,7 @@ const WINES = [
   },
   {
     id: 'wine-featherstone-riesling',
+    sourcePage: 'Wine List, p.1',
     name: 'Featherstone Estate "Black Sheep" Riesling',
     category: 'wine', subcategory: 'white',
     varietal: 'Riesling',
@@ -99,6 +108,7 @@ const WINES = [
   },
   {
     id: 'wine-novellum-chardonnay',
+    sourcePage: 'Wine List, p.1',
     name: 'Novellum Chardonnay',
     category: 'wine', subcategory: 'white',
     varietal: 'Chardonnay',
@@ -109,6 +119,7 @@ const WINES = [
   },
   {
     id: 'wine-saint-preignan',
+    sourcePage: 'Wine List, p.2',
     name: 'Saint Preignan Pinot Noir',
     category: 'wine', subcategory: 'red',
     varietal: 'Pinot Noir',
@@ -119,6 +130,7 @@ const WINES = [
   },
   {
     id: 'wine-cusumano-merlot',
+    sourcePage: 'Wine List, p.2',
     name: 'Cusumano Merlot',
     category: 'wine', subcategory: 'red',
     varietal: 'Merlot',
@@ -129,6 +141,7 @@ const WINES = [
   },
   {
     id: 'wine-foris-fly-over',
+    sourcePage: 'Wine List, p.2',
     name: 'Foris Vineyard "Fly Over" Red Blend',
     category: 'wine', subcategory: 'red',
     varietal: 'Red Blend (Cabernet Sauvignon, Syrah, Tempranillo & others)',
@@ -139,6 +152,7 @@ const WINES = [
   },
   {
     id: 'wine-domaine-garriguettes',
+    sourcePage: 'Wine List, p.2',
     name: 'Domaine des Garriguettes "Fleur de Lune" Rouge',
     category: 'wine', subcategory: 'red',
     varietal: 'Grenache, Syrah, Carignan Blend',
@@ -149,6 +163,7 @@ const WINES = [
   },
   {
     id: 'wine-spier-block-5',
+    sourcePage: 'Wine List, p.2',
     name: 'Spier "Creative Block 5"',
     category: 'wine', subcategory: 'red',
     varietal: 'Cabernet Sauvignon-based Bordeaux Blend',
@@ -159,6 +174,7 @@ const WINES = [
   },
   {
     id: 'wine-conejo-malbec',
+    sourcePage: 'Wine List, p.2',
     name: 'Conejo Verde Malbec',
     category: 'wine', subcategory: 'red',
     varietal: 'Malbec',
@@ -169,6 +185,7 @@ const WINES = [
   },
   {
     id: 'wine-amulet-cabernet',
+    sourcePage: 'Wine List, p.2',
     name: 'Amulet Estate "75 Wine Company" Cabernet Sauvignon',
     category: 'wine', subcategory: 'red',
     varietal: 'Cabernet Sauvignon',
@@ -179,6 +196,7 @@ const WINES = [
   },
   {
     id: 'wine-cavallo-syrah',
+    sourcePage: 'Wine List, p.2',
     name: 'Cavallo Syrah',
     category: 'wine', subcategory: 'red',
     varietal: 'Syrah',
@@ -189,6 +207,7 @@ const WINES = [
   },
   {
     id: 'wine-gate22-navigator',
+    sourcePage: 'Wine List, p.2',
     name: 'Gate 22 "The Navigator" Cabernet Sauvignon',
     category: 'wine', subcategory: 'red',
     varietal: 'Cabernet Sauvignon',
@@ -199,6 +218,7 @@ const WINES = [
   },
   {
     id: 'wine-mary-taylor-bordeaux',
+    sourcePage: 'Wine List, p.3',
     name: 'Mary Taylor Bordeaux Rouge',
     category: 'wine', subcategory: 'red',
     varietal: 'Merlot & Cabernet Sauvignon Blend',
@@ -209,6 +229,7 @@ const WINES = [
   },
   {
     id: 'wine-tenuta-fanti',
+    sourcePage: 'Wine List, p.3',
     name: 'Tenuta Fanti "Poggio Torto" IGT ("Baby Super Tuscan")',
     category: 'wine', subcategory: 'red',
     varietal: 'Sangiovese, Merlot & Cabernet Blend',
@@ -219,6 +240,7 @@ const WINES = [
   },
   {
     id: 'wine-corral-de-campanas',
+    sourcePage: 'Wine List, p.3',
     name: 'Corral de Campanas Tinta de Toro',
     category: 'wine', subcategory: 'red',
     varietal: 'Tempranillo (Tinta de Toro)',
@@ -229,6 +251,7 @@ const WINES = [
   },
   {
     id: 'wine-castello-di-radda',
+    sourcePage: 'Wine List, p.3',
     name: 'Castello di Radda Chianti Classico',
     category: 'wine', subcategory: 'red',
     varietal: 'Sangiovese',
@@ -242,6 +265,7 @@ const WINES = [
 const COCKTAILS = [
   {
     id: 'cocktail-nonnas-bellini',
+    sourcePage: 'Menu Knowledge, p.1',
     name: "Not Your Nonna's Bellini",
     category: 'cocktail', subcategory: 'sangria-sparkling',
     blurb: "Back to the roots — a traditional bellini with our own house take: black pepper & plum with our favourite Spumante. NOT a slush drink.",
@@ -252,6 +276,7 @@ const COCKTAILS = [
   },
   {
     id: 'cocktail-strawberry-watermelon-sangria',
+    sourcePage: 'Menu Knowledge, p.1',
     name: 'Strawberry Watermelon Rosé Sangria',
     category: 'cocktail', subcategory: 'sangria',
     blurb: 'Fruit forward, touch of sweet, rosé sangria — a splash of summer.',
@@ -262,6 +287,7 @@ const COCKTAILS = [
   },
   {
     id: 'cocktail-cherry-berry-sangria',
+    sourcePage: 'Menu Knowledge, p.1',
     name: 'Cherry Berry Red Sangria',
     category: 'cocktail', subcategory: 'sangria',
     blurb: "You'll never ask for a standard red sangria again — bittersweet, stonefruit forward, not your typical red sangria.",
@@ -272,6 +298,7 @@ const COCKTAILS = [
   },
   {
     id: 'cocktail-kiwinichiwa-mojito',
+    sourcePage: 'Menu Knowledge, p.1',
     name: "Kiwi'nichiwa Mojito",
     category: 'cocktail', subcategory: 'mojito',
     blurb: "You'll never ask for a standard mojito again — after this one, you'll feel refreshed all summer long.",
@@ -282,6 +309,7 @@ const COCKTAILS = [
   },
   {
     id: 'cocktail-berry-smooth-operator',
+    sourcePage: 'Menu Knowledge, p.2',
     name: 'Berry Smooth Operator',
     category: 'cocktail', subcategory: 'signature',
     blurb: 'Refreshing, smooth, well balanced. Pineapple & lemon for brightness, silky egg-white foam — if you like a tequila sour, you\'ll enjoy this.',
@@ -292,6 +320,7 @@ const COCKTAILS = [
   },
   {
     id: 'cocktail-overboard',
+    sourcePage: 'Menu Knowledge, p.2',
     name: 'Overboard',
     category: 'cocktail', subcategory: 'signature',
     blurb: 'A bold mango margarita, topped with a bubble-bath salt foam that rounds out the balance of fruit, salt and tequila.',
@@ -302,6 +331,7 @@ const COCKTAILS = [
   },
   {
     id: 'cocktail-barbaretta-caesar',
+    sourcePage: 'Menu Knowledge, p.2',
     name: 'Barbaretta Caesar',
     category: 'cocktail', subcategory: 'signature',
     blurb: "Partnering with all things local — here's the next best caesar. Snack on top, spice rack vodka, and don't forget the horseradish.",
@@ -312,6 +342,7 @@ const COCKTAILS = [
   },
   {
     id: 'cocktail-totally-wired',
+    sourcePage: 'Menu Knowledge, p.2',
     name: 'Totally Wired',
     category: 'cocktail', subcategory: 'signature',
     blurb: "Doing what we do best — challenging the norm for espresso martinis. Packed with flavour, not just a caffeine kick.",
@@ -322,6 +353,7 @@ const COCKTAILS = [
   },
   {
     id: 'cocktail-hubba-hubba',
+    sourcePage: 'Menu Knowledge, p.5',
     name: 'Hubba Hubba',
     category: 'cocktail', subcategory: 'signature',
     blurb: 'Feeling nostalgic — cheers to your childhood love of Hubba Bubba.',
@@ -332,6 +364,7 @@ const COCKTAILS = [
   },
   {
     id: 'cocktail-london-london-bridge',
+    sourcePage: 'Menu Knowledge, p.5',
     name: 'London London Bridge',
     category: 'cocktail', subcategory: 'signature',
     blurb: 'London fog, meet cocktail — our own whiskey/gin creation.',
@@ -342,6 +375,7 @@ const COCKTAILS = [
   },
   {
     id: 'cocktail-playing-with-fire',
+    sourcePage: 'Menu Knowledge, p.5',
     name: 'Playing with Fire',
     category: 'cocktail', subcategory: 'whiskey',
     blurb: 'A classic with a twist — enjoy a great old fashioned with a smoky flavour.',
@@ -352,6 +386,7 @@ const COCKTAILS = [
   },
   {
     id: 'cocktail-black-velvet',
+    sourcePage: 'Menu Knowledge, p.5',
     name: 'Black Velvet (if you please)',
     category: 'cocktail', subcategory: 'whiskey',
     blurb: 'Our signature cocktail-and-wine-list meet — consider this an entry-level step into the smoky and bold section.',
@@ -362,6 +397,7 @@ const COCKTAILS = [
   },
   {
     id: 'cocktail-honey-old-fashioned',
+    sourcePage: 'Menu Knowledge, p.5',
     name: "Honey, I'm Old Fashioned",
     category: 'cocktail', subcategory: 'whiskey',
     blurb: 'The flavour profile of a warm spiced old fashioned, with the refreshing mouthfeel of a whiskey sour.',
@@ -372,6 +408,7 @@ const COCKTAILS = [
   },
   {
     id: 'cocktail-cherry-bomb',
+    sourcePage: 'Menu Knowledge, p.10',
     name: 'Cherry Bomb',
     category: 'cocktail', subcategory: 'whiskey',
     blurb: "House-made cherry soda and bourbon — it'll have you singing \"cha cha cherry bomb.\"",
@@ -382,6 +419,7 @@ const COCKTAILS = [
   },
   {
     id: 'cocktail-golden-cobbler',
+    sourcePage: 'Menu Knowledge, p.10',
     name: 'Golden Cobbler',
     category: 'cocktail', subcategory: 'signature',
     blurb: 'A white port spritzer — fruity, fresh, and inviting.',
@@ -392,6 +430,7 @@ const COCKTAILS = [
   },
   {
     id: 'cocktail-spill-the-tea',
+    sourcePage: 'Menu Knowledge, p.10',
     name: 'Spill the Tea',
     category: 'cocktail', subcategory: 'signature',
     blurb: 'Blueberry tea and iced teas loved since childhood.',
@@ -402,6 +441,7 @@ const COCKTAILS = [
   },
   {
     id: 'cocktail-cold-morning-pick',
+    sourcePage: 'Menu Knowledge, p.10',
     name: 'Cold Morning Pick',
     category: 'cocktail', subcategory: 'shot',
     blurb: 'A blueberry shot — herbal & sweet.',
@@ -412,6 +452,7 @@ const COCKTAILS = [
   },
   {
     id: 'cocktail-pick-me-up',
+    sourcePage: 'Menu Knowledge, p.10',
     name: 'Pick Me Up',
     category: 'cocktail', subcategory: 'shot',
     blurb: 'A raspberry shot — bittersweet.',
@@ -422,6 +463,7 @@ const COCKTAILS = [
   },
   {
     id: 'cocktail-last-pick',
+    sourcePage: 'Menu Knowledge, p.11',
     name: 'Last Pick',
     category: 'cocktail', subcategory: 'shot',
     blurb: 'A strawberry shot — savoury & sweet.',
@@ -432,6 +474,7 @@ const COCKTAILS = [
   },
   {
     id: 'mocktail-cloud-nine',
+    sourcePage: 'Menu Knowledge, p.11',
     name: 'Cloud Nine',
     category: 'cocktail', subcategory: 'mocktail',
     blurb: 'A blood orange amaretto sour — but make it non-alcoholic.',
@@ -442,6 +485,7 @@ const COCKTAILS = [
   },
   {
     id: 'mocktail-mystic-magic',
+    sourcePage: 'Menu Knowledge, p.11',
     name: 'Mystic Magic',
     category: 'cocktail', subcategory: 'mocktail',
     blurb: 'A silky mouthfeel, balanced between almond and floral flavours.',
@@ -452,6 +496,7 @@ const COCKTAILS = [
   },
   {
     id: 'mocktail-cucumber-spritz',
+    sourcePage: 'Menu Knowledge, p.11',
     name: 'Cucumber Spritz',
     category: 'cocktail', subcategory: 'mocktail',
     blurb: 'A hugo-spritz-style, tea-inspired mocktail — very refreshing.',
@@ -462,6 +507,7 @@ const COCKTAILS = [
   },
   {
     id: 'mocktail-pina-not-a-colada',
+    sourcePage: 'Menu Knowledge, p.11',
     name: 'Pina Not a Colada',
     category: 'cocktail', subcategory: 'mocktail',
     blurb: 'An orange creamsicle margarita — but make it non-alcoholic.',
@@ -483,6 +529,7 @@ const WELL_LIQUORS = [
 const FOOD = [
   {
     id: 'food-crispy-brussel-sprouts',
+    sourcePage: 'Menu Knowledge, p.8',
     name: 'Crispy Brussel Sprouts',
     category: 'food', subcategory: 'starter',
     blurb: 'Your new favourite way to eat brussels — hot honey glaze, creamy citrus aioli, with a crunch.',
@@ -493,6 +540,7 @@ const FOOD = [
   },
   {
     id: 'food-bacon-and-eggs',
+    sourcePage: 'Menu Knowledge, p.8',
     name: 'Bacon & Eggs',
     category: 'food', subcategory: 'starter',
     blurb: 'Gluten aware — ask and you shall receive, just like Barbacoa. Can sub GF.',
@@ -503,6 +551,7 @@ const FOOD = [
   },
   {
     id: 'food-dip-trio',
+    sourcePage: 'Menu Knowledge, p.8',
     name: 'Dip Trio',
     category: 'food', subcategory: 'starter',
     blurb: 'Whipped ricotta & truffle honey, charred corn & bacon, and dill pickle dip — not GF.',
@@ -513,6 +562,7 @@ const FOOD = [
   },
   {
     id: 'food-sui-mai',
+    sourcePage: 'Menu Knowledge, p.8',
     name: 'Sui Mai',
     category: 'food', subcategory: 'starter',
     blurb: 'Juicy pork and shrimp dumpling, cradled in a steamed wonton wrapper — guest favourite since day one. Comes in 3, can add one.',
@@ -523,6 +573,7 @@ const FOOD = [
   },
   {
     id: 'food-burrata',
+    sourcePage: 'Menu Knowledge, p.7',
     name: 'Burrata',
     category: 'food', subcategory: 'starter',
     blurb: 'No need to decide between GF crackers or sourdough — we give you it all. Creamy burrata.',
@@ -533,6 +584,7 @@ const FOOD = [
   },
   {
     id: 'food-smoked-wings',
+    sourcePage: 'Menu Knowledge, p.7',
     name: 'Smoked Wings',
     category: 'food', subcategory: 'starter',
     blurb: "No need to decide between wing or flat — we give you it all.",
@@ -543,6 +595,7 @@ const FOOD = [
   },
   {
     id: 'food-goat-cheese-croquettes',
+    sourcePage: 'Menu Knowledge, p.7',
     name: 'Goat Cheese Croquettes',
     category: 'food', subcategory: 'starter',
     blurb: 'Warm cheese with a little spice and a refreshing twist.',
@@ -553,6 +606,7 @@ const FOOD = [
   },
   {
     id: 'food-barbaretta-board',
+    sourcePage: 'Menu Knowledge, p.7',
     name: 'Barbaretta Board',
     category: 'food', subcategory: 'starter',
     blurb: 'A mix of made-in-house and local — featuring cheeses from Barbaretta and Lakeside, accompanied with meats from Brickhouse. Cheese stays, meat rotates.',
@@ -563,6 +617,7 @@ const FOOD = [
   },
   {
     id: 'food-carpaccio',
+    sourcePage: 'Menu Knowledge, p.4',
     name: 'Carpaccio',
     category: 'food', subcategory: 'salad',
     blurb: 'Spiced Asian-inspired carpaccio.',
@@ -573,6 +628,7 @@ const FOOD = [
   },
   {
     id: 'food-market-bowl',
+    sourcePage: 'Menu Knowledge, p.4',
     name: 'Market Bowl',
     category: 'food', subcategory: 'salad',
     blurb: 'A summer salad, with a choice of grilled chicken breast or garlic prawns.',
@@ -583,6 +639,7 @@ const FOOD = [
   },
   {
     id: 'food-crispy-chicken-salad',
+    sourcePage: 'Menu Knowledge, p.4',
     name: 'Crispy Chicken Salad',
     category: 'food', subcategory: 'salad',
     blurb: 'Crispy fried chicken over a bed of baby greens, charred corn, and chaga cheddar, herbed ranch for a balance of crunch, fresh, and creamy.',
@@ -593,6 +650,7 @@ const FOOD = [
   },
   {
     id: 'food-bulgogi-blue-steak-salad',
+    sourcePage: 'Menu Knowledge, p.4',
     name: 'Bulgogi Blue Steak Salad',
     category: 'food', subcategory: 'salad',
     blurb: 'Sweet and savoury Korean-style flavours, baby greens, grilled vegetables, tangy blue cheese dressing.',
@@ -603,6 +661,7 @@ const FOOD = [
   },
   {
     id: 'food-kfc',
+    sourcePage: 'Menu Knowledge, p.3',
     name: 'KFC',
     category: 'food', subcategory: 'main',
     blurb: "Messy but worth it — we'll bring you extra napkins.",
@@ -613,6 +672,7 @@ const FOOD = [
   },
   {
     id: 'food-truffle-mushroom-burger',
+    sourcePage: 'Menu Knowledge, p.3',
     name: 'Truffle Mushroom Lux Burger',
     category: 'food', subcategory: 'main',
     blurb: 'Go big or go home — swapping out the smash for a step up featuring a thick and gooey mornay sauce.',
@@ -623,6 +683,7 @@ const FOOD = [
   },
   {
     id: 'food-halibut',
+    sourcePage: 'Menu Knowledge, p.3',
     name: 'Halibut',
     category: 'food', subcategory: 'main',
     blurb: 'Pistachio-crusted halibut (very juicy, white fish) served with a rhubarb beurre blanc (white wine butter sauce).',
@@ -633,6 +694,7 @@ const FOOD = [
   },
   {
     id: 'food-chicken-risotto',
+    sourcePage: 'Menu Knowledge, p.9',
     name: 'Chicken & Risotto',
     category: 'food', subcategory: 'main',
     blurb: 'Creamy risotto, fresh veggies, lemon gremolata, accompanied with herb/lemon chicken supreme.',
@@ -643,6 +705,7 @@ const FOOD = [
   },
   {
     id: 'food-north-country-steak',
+    sourcePage: 'Menu Knowledge, p.9',
     name: 'North Country Steak',
     category: 'food', subcategory: 'main',
     blurb: 'Traditional composed steak dinner, with options for house butters, prawns, and mushrooms.',
@@ -653,6 +716,7 @@ const FOOD = [
   },
   {
     id: 'food-pork-chop',
+    sourcePage: 'Menu Knowledge, p.9',
     name: 'Pork Chop',
     category: 'food', subcategory: 'main',
     blurb: 'Pork chop cooked to the chef\'s recommendation of medium.',
@@ -663,6 +727,7 @@ const FOOD = [
   },
   {
     id: 'food-linguini',
+    sourcePage: 'Menu Knowledge, p.9',
     name: 'Linguini',
     category: 'food', subcategory: 'main',
     blurb: 'Creamy basil pesto, heirloom tomatoes, burrata, basil gremolata.',
@@ -673,6 +738,7 @@ const FOOD = [
   },
   {
     id: 'food-taco',
+    sourcePage: 'Menu Knowledge, p.9',
     name: 'Taco',
     category: 'food', subcategory: 'main',
     blurb: 'Two refreshing tacos with your choice of tempura fried halibut, or blackened chicken.',
@@ -683,6 +749,7 @@ const FOOD = [
   },
   {
     id: 'food-white-chocolate-cheesecake',
+    sourcePage: 'Menu Knowledge, p.3',
     name: 'White Chocolate Cheesecake',
     category: 'food', subcategory: 'dessert',
     blurb: 'Jarred and sous vide cheesecake — creating a perfect consistency, texture, and overall cook.',
@@ -693,6 +760,7 @@ const FOOD = [
   },
   {
     id: 'food-sticky-toffee-pudding',
+    sourcePage: 'Menu Knowledge, p.3',
     name: 'Sticky Toffee Pudding',
     category: 'food', subcategory: 'dessert',
     blurb: "Staff favourite — rich, cozy, indulgent. Brought out first.",
@@ -703,6 +771,7 @@ const FOOD = [
   },
   {
     id: 'food-chimichurri-butter',
+    sourcePage: 'Menu Knowledge, p.6',
     name: 'Chimichurri Butter',
     category: 'food', subcategory: 'sauce',
     blurb: 'House-made compound butter, infused with parsley, oregano, and chillies.',
@@ -713,6 +782,7 @@ const FOOD = [
   },
   {
     id: 'food-cowboy-butter',
+    sourcePage: 'Menu Knowledge, p.6',
     name: 'Cowboy Butter',
     category: 'food', subcategory: 'sauce',
     blurb: 'Think BBQ smokey flavour — our house-made cajun spice, used throughout the menu.',
@@ -723,6 +793,7 @@ const FOOD = [
   },
   {
     id: 'food-blue-cheese-butter',
+    sourcePage: 'Menu Knowledge, p.6',
     name: 'Blue Cheese Butter',
     category: 'food', subcategory: 'sauce',
     blurb: 'House-made compound butter with tangy blue cheese.',
@@ -733,6 +804,7 @@ const FOOD = [
   },
   {
     id: 'food-garlic-mushrooms',
+    sourcePage: 'Menu Knowledge, p.6',
     name: 'Garlic Mushrooms',
     category: 'food', subcategory: 'sauce',
     blurb: 'Garlic butter, wild mushroom mix — thyme, tamari, white wine, kosher salt, black pepper, shallots.',
@@ -743,6 +815,7 @@ const FOOD = [
   },
   {
     id: 'food-garlic-prawns',
+    sourcePage: 'Menu Knowledge, p.6',
     name: 'Garlic Prawns',
     category: 'food', subcategory: 'sauce',
     blurb: 'Garlic butter, 31-40 count prawns, no tail.',
@@ -753,6 +826,7 @@ const FOOD = [
   },
   {
     id: 'food-add-on-chicken-breast',
+    sourcePage: 'Menu Knowledge, p.6',
     name: 'Add-On Chicken Breast',
     category: 'food', subcategory: 'sauce',
     blurb: 'A simple protein add-on for any dish.',

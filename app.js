@@ -148,6 +148,9 @@
   tabBar.addEventListener('click', e => {
     const btn = e.target.closest('.tab-btn');
     if (!btn) return;
+    // Navigating to Quiz via the tab bar always starts at the setup screen —
+    // only a direct "Drill weak spots" launch from Review skips straight into a session.
+    if (btn.dataset.view === 'quiz') quizState.phase = 'setup';
     switchView(btn.dataset.view);
   });
 
@@ -251,12 +254,16 @@
       rows.push(['Allergens', item.allergens]);
       rows.push(['Garnish / Preset', item.preset]);
     }
-    return rows.map(([label, val]) => `
+    let html = rows.map(([label, val]) => `
       <div class="detail-row">
         <div class="detail-label">${label}</div>
         <div class="detail-value">${escapeHtml(val || 'N/A')}</div>
       </div>
     `).join('');
+    if (item.sourcePage) {
+      html += `<div class="detail-row"><div class="detail-label">Source Page</div><div class="detail-value" style="color:var(--muted);font-size:13px">📄 ${escapeHtml(item.sourcePage)}</div></div>`;
+    }
+    return html;
   }
 
   /* ============================ QUIZ ============================ */
@@ -444,8 +451,7 @@
     root.innerHTML = `
       <div class="section-title">Quiz</div>
       <div class="quiz-setup-card">
-        <h2>Ready to get grilled?</h2>
-        <p>Simulated customer questions, pulled straight from the menu binder.</p>
+        <h2>Pick Your Quiz</h2>
         <div class="section-title" style="text-align:left">Category</div>
         <div class="pill-row" id="quiz-cats">
           ${cats.map(([k, l]) => `<button class="pill ${quizState.category === k ? 'active' : ''}" data-cat="${k}">${l}</button>`).join('')}
