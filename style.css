@@ -33,6 +33,33 @@ body {
 
 h1, h2, h3 { font-family: Georgia, 'Times New Roman', serif; margin: 0; }
 
+.gate-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.gate-overlay.hidden { display: none; }
+
+.gate-card {
+  width: 100%;
+  max-width: 340px;
+  text-align: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px 24px;
+}
+.gate-emoji { font-size: 40px; margin-bottom: 4px; }
+.gate-card h2 { color: var(--gold-bright); font-size: 22px; margin-bottom: 8px; }
+.gate-card p { color: var(--muted); font-size: 13px; margin: 0 0 18px; }
+.gate-card .search-input { text-align: center; margin-bottom: 12px; }
+.gate-error { color: var(--red); font-size: 13px; min-height: 18px; margin: 10px 0 0; }
+
 .app-header {
   background: linear-gradient(180deg, var(--bg-elev), var(--bg));
   border-bottom: 1px solid var(--border);

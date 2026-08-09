@@ -3,11 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
 <title>Racoonnoisseur — House Menu Trainer</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦝</text></svg>">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+<div class="gate-overlay" id="gate-overlay">
+  <div class="gate-card">
+    <div class="gate-emoji">🦝🔒</div>
+    <h2>Racoonnoisseur</h2>
+    <p>Private study tool — enter the shared password to continue.</p>
+    <input type="password" id="gate-input" class="search-input" placeholder="Password" autocomplete="current-password" autocapitalize="off" autocorrect="off">
+    <button class="btn block" id="gate-submit">Unlock</button>
+    <p class="gate-error" id="gate-error"></p>
+  </div>
+</div>
 
 <header class="app-header">
   <div class="brand">

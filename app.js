@@ -1,6 +1,57 @@
 (function () {
   'use strict';
 
+  /* ============================ password gate ============================ */
+  /* NOTE: this is a deterrent, not real security. This is a static site with no
+     server — anyone who specifically requests data.js directly can still read the
+     raw menu data regardless of this gate. It exists to keep casual visitors and
+     search engines from landing on the page and seeing it render. */
+
+  const GATE_HASH = 'df4ac416257333cf770e5b162da9c2a06b37e428d0a4035ec3a0f114df08d231';
+  const GATE_KEY = 'racoonnoisseur-unlocked-v1';
+
+  async function sha256Hex(text) {
+    const bytes = new TextEncoder().encode(text);
+    const digest = await crypto.subtle.digest('SHA-256', bytes);
+    return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  function isUnlocked() {
+    return localStorage.getItem(GATE_KEY) === '1';
+  }
+
+  function initGate(onUnlock) {
+    const overlay = document.getElementById('gate-overlay');
+    if (isUnlocked()) {
+      overlay.classList.add('hidden');
+      onUnlock();
+      return;
+    }
+
+    const input = document.getElementById('gate-input');
+    const errorEl = document.getElementById('gate-error');
+    const submit = document.getElementById('gate-submit');
+
+    async function tryUnlock() {
+      const value = input.value;
+      if (!value) return;
+      const hash = await sha256Hex(value);
+      if (hash === GATE_HASH) {
+        localStorage.setItem(GATE_KEY, '1');
+        overlay.classList.add('hidden');
+        onUnlock();
+      } else {
+        errorEl.textContent = 'Wrong password — try again.';
+        input.value = '';
+        input.focus();
+      }
+    }
+
+    submit.addEventListener('click', tryUnlock);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
+    input.focus();
+  }
+
   /* ============================ storage / stats ============================ */
 
   const STORAGE_KEY = 'racoonnoisseur-stats-v1';
@@ -717,5 +768,5 @@
 
   /* ============================ init ============================ */
 
-  switchView('study');
+  initGate(() => switchView('study'));
 })();
