@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Racoonnoisseur — House Menu Trainer</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦝</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="app-header">
+  <div class="brand">
+    <span class="brand-emoji">🦝</span>
+    <div class="brand-text">
+      <h1>Racoonnoisseur</h1>
+      <p>House menu trainer</p>
+    </div>
+  </div>
+</header>
+
+<main id="view-root" class="view-root"></main>
+
+<nav class="tab-bar" id="tab-bar">
+  <button class="tab-btn" data-view="study" aria-label="Study">
+    <span class="tab-icon">🃏</span><span>Study</span>
+  </button>
+  <button class="tab-btn" data-view="quiz" aria-label="Quiz">
+    <span class="tab-icon">❓</span><span>Quiz</span>
+  </button>
+  <button class="tab-btn" data-view="review" aria-label="Review">
+    <span class="tab-icon">🎯</span><span>Review</span>
+  </button>
+  <button class="tab-btn" data-view="reference" aria-label="Reference">
+    <span class="tab-icon">📖</span><span>Reference</span>
+  </button>
+</nav>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
