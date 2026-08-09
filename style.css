@@ -355,7 +355,7 @@ h1, h2, h3 { font-family: Georgia, 'Times New Roman', serif; margin: 0; }
   width: 100%;
 }
 
-.page-table th, .page-table td.page-cell {
+.page-table th, .page-table td {
   border: 1px solid var(--border);
   padding: 10px 12px;
   vertical-align: top;
@@ -366,29 +366,32 @@ h1, h2, h3 { font-family: Georgia, 'Times New Roman', serif; margin: 0; }
 .page-table thead th {
   background: var(--bg-elev);
   color: var(--gold-bright);
-  font-size: 13px;
   white-space: nowrap;
 }
 
-.page-table tbody th {
-  background: var(--bg-elev);
-  color: var(--muted);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  white-space: nowrap;
-  position: sticky;
-  left: 0;
-}
-
-.page-table td.page-cell {
+.page-table .page-cell {
   background: var(--bg-card);
   min-width: 160px;
   max-width: 220px;
   cursor: pointer;
 }
-.page-table td.page-cell.highlighted { background: rgba(205, 164, 94, 0.22); }
-.page-table td.page-cell.editing-cell { cursor: default; min-width: 220px; }
+/* The left-most cell in each row (item name / spirit) stays visible while scrolling sideways. */
+.page-table .page-cell-head {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--bg-elev);
+  color: var(--gold-bright);
+  font-weight: 600;
+  white-space: normal;
+}
+.page-table .page-cell.cell-color-gold { background: rgba(205, 164, 94, 0.22); }
+.page-table .page-cell.cell-color-green { background: rgba(127, 176, 105, 0.22); }
+.page-table .page-cell.cell-color-red { background: rgba(217, 105, 95, 0.22); }
+.page-table .page-cell-head.cell-color-gold { background: rgba(205, 164, 94, 0.32); }
+.page-table .page-cell-head.cell-color-green { background: rgba(127, 176, 105, 0.32); }
+.page-table .page-cell-head.cell-color-red { background: rgba(217, 105, 95, 0.32); }
+.page-table .page-cell.editing-cell { cursor: default; min-width: 220px; }
 
 .page-cell-value { white-space: pre-wrap; }
 .page-cell-note {
@@ -403,14 +406,30 @@ h1, h2, h3 { font-family: Georgia, 'Times New Roman', serif; margin: 0; }
 }
 
 .cell-note-input { margin-top: 8px; margin-bottom: 8px; font-size: 13px; }
-.cell-highlight-toggle {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12.5px;
-  color: var(--muted);
+.cell-color-row { display: flex; gap: 10px; margin: 4px 0 2px; }
+.color-swatch-label { display: flex; cursor: pointer; }
+.color-swatch-label input { position: absolute; opacity: 0; width: 0; height: 0; }
+.color-swatch {
+  display: block;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
 }
-.cell-highlight-toggle input { width: 16px; height: 16px; }
+.swatch-none { background: var(--bg-card); }
+.swatch-gold { background: var(--gold); }
+.swatch-green { background: var(--green); }
+.swatch-red { background: var(--red); }
+.color-swatch-label input:checked + .color-swatch {
+  border-color: var(--cream);
+  box-shadow: 0 0 0 2px var(--bg-card);
+}
+
+/* ---------- Reference: page-grid zoom controls ---------- */
+
+.zoom-row { display: flex; align-items: center; gap: 8px; margin: 10px 0; }
+.zoom-btn { padding: 6px 16px; width: auto; flex: 0 0 auto; }
+.zoom-label { font-size: 13px; color: var(--muted); min-width: 42px; text-align: center; }
 
 @media (min-width: 720px) {
   .view-root { padding-top: 24px; }

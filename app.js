@@ -158,15 +158,19 @@
   let annotations = loadAnnotations();
 
   function getAnnotation(itemId, field) {
-    return (annotations[itemId] && annotations[itemId][field]) || null;
+    const ann = (annotations[itemId] && annotations[itemId][field]) || null;
+    if (!ann) return null;
+    // Older saved annotations used a boolean `highlight` flag instead of a color.
+    if (ann.color === undefined) return { note: ann.note || '', color: ann.highlight ? 'gold' : '' };
+    return ann;
   }
 
-  function setAnnotation(itemId, field, { note, highlight }) {
+  function setAnnotation(itemId, field, { note, color }) {
     const forItem = annotations[itemId] || {};
-    if (!note && !highlight) {
+    if (!note && !color) {
       delete forItem[field];
     } else {
-      forItem[field] = { note: note || '', highlight: !!highlight };
+      forItem[field] = { note: note || '', color: color || '' };
     }
     if (Object.keys(forItem).length === 0) delete annotations[itemId];
     else annotations[itemId] = forItem;
@@ -685,7 +689,9 @@
 
   /* ============================ REFERENCE ============================ */
 
-  const refState = { search: '', category: 'all', editingId: null, mode: 'list', pageIndex: 0, editingCell: null };
+  const refState = { search: '', category: 'all', editingId: null, mode: 'list', pageIndex: 0, editingCell: null, zoom: 1 };
+
+  function clampZoom(z) { return Math.min(1.3, Math.max(0.5, Math.round(z * 10) / 10)); }
 
   function getPageGroups() {
     const winePages = ['Wine List, p.1', 'Wine List, p.2', 'Wine List, p.3'];
@@ -707,57 +713,69 @@
     return label.replace('Wine List, ', 'Wine ').replace('Menu Knowledge, ', 'Menu ');
   }
 
-  function pageCellHtml(item, field) {
+  const CELL_COLORS = [['', 'None'], ['gold', 'Gold'], ['green', 'Know it'], ['red', 'Review']];
+
+  function pageCellHtml(item, field, asHeader) {
     const ann = getAnnotation(item.id, field);
     const editingThis = refState.editingCell && refState.editingCell.id === item.id && refState.editingCell.field === field;
     const value = field === 'name' ? item.name : (item[field] || 'N/A');
+    const tag = asHeader ? 'th' : 'td';
+    const headClass = asHeader ? ' page-cell-head' : '';
     if (editingThis) {
+      const currentColor = ann ? (ann.color || '') : '';
       return `
-        <td class="page-cell editing-cell" data-id="${item.id}" data-field="${field}">
+        <${tag} class="page-cell editing-cell${headClass}" data-id="${item.id}" data-field="${field}">
           <div class="page-cell-value">${escapeHtml(value)}</div>
           <textarea class="search-input cell-note-input" rows="2" placeholder="Add a note...">${escapeHtml(ann ? ann.note : '')}</textarea>
-          <label class="cell-highlight-toggle"><input type="checkbox" class="cell-highlight-input" ${ann && ann.highlight ? 'checked' : ''}> Highlight this cell</label>
+          <div class="cell-color-row">
+            ${CELL_COLORS.map(([val, label]) => `
+              <label class="color-swatch-label" title="${label}">
+                <input type="radio" name="cell-color" value="${val}" ${currentColor === val ? 'checked' : ''}>
+                <span class="color-swatch swatch-${val || 'none'}"></span>
+              </label>
+            `).join('')}
+          </div>
           <div class="study-nav" style="margin-top:8px">
             <button class="btn secondary" data-cell-action="cancel">Cancel</button>
             <button class="btn" data-cell-action="save">Save</button>
           </div>
           ${ann ? `<button class="btn secondary block" data-cell-action="clear" style="margin-top:8px">Clear note</button>` : ''}
-        </td>
+        </${tag}>
       `;
     }
+    const colorClass = ann && ann.color ? `cell-color-${ann.color}` : '';
     return `
-      <td class="page-cell ${ann && ann.highlight ? 'highlighted' : ''}" data-id="${item.id}" data-field="${field}">
+      <${tag} class="page-cell ${colorClass}${headClass}" data-id="${item.id}" data-field="${field}">
         <div class="page-cell-value">${escapeHtml(value)}</div>
         ${ann && ann.note ? `<div class="page-cell-note">📝 ${escapeHtml(ann.note)}</div>` : ''}
-      </td>
+      </${tag}>
     `;
   }
 
+  // Each row is one item (wine / menu item / well liquor), read left to right through its
+  // fields — matching the printed binder rather than a field-per-row / item-per-column grid.
   function renderPageTable(page) {
-    if (page.type === 'liquors') {
-      const rows = [['spirit', 'Spirit'], ['brand', 'Brand']];
-      return `
-        <div class="page-table-wrap">
-          <table class="page-table">
-            <tbody>
-              ${rows.map(([field, label]) => `<tr><th>${label}</th>${page.items.map(item => pageCellHtml(item, field)).join('')}</tr>`).join('')}
-            </tbody>
-          </table>
-        </div>
-      `;
-    }
     if (page.items.length === 0) return '<div class="empty-state">No items landed on this page.</div>';
-    const rows = page.type === 'wine'
-      ? [['varietal', 'Varietal'], ['region', 'Region'], ['blurb', 'Flavour Profile'], ['pairings', 'Food Pairings']]
-      : [['blurb', 'Story & Flavour'], ['composition', 'Composition'], ['allergens', 'Allergens'], ['preset', 'Garnish / Preset']];
+    const fields = page.type === 'liquors'
+      ? [['brand', 'Brand']]
+      : page.type === 'wine'
+        ? [['varietal', 'Varietal'], ['region', 'Region'], ['blurb', 'Flavour Profile'], ['pairings', 'Food Pairings']]
+        : [['blurb', 'Story & Flavour'], ['composition', 'Composition'], ['allergens', 'Allergens'], ['preset', 'Garnish / Preset']];
+    const firstColLabel = page.type === 'wine' ? 'Wine' : page.type === 'liquors' ? 'Spirit' : 'Menu Item';
+    const firstColField = page.type === 'liquors' ? 'spirit' : 'name';
     return `
-      <div class="page-table-wrap">
+      <div class="page-table-wrap" style="zoom:${refState.zoom}">
         <table class="page-table">
           <thead>
-            <tr><th>${page.type === 'wine' ? 'Wine' : 'Menu Item'}</th>${page.items.map(item => pageCellHtml(item, 'name')).join('')}</tr>
+            <tr><th>${firstColLabel}</th>${fields.map(([, label]) => `<th>${label}</th>`).join('')}</tr>
           </thead>
           <tbody>
-            ${rows.map(([field, label]) => `<tr><th>${label}</th>${page.items.map(item => pageCellHtml(item, field)).join('')}</tr>`).join('')}
+            ${page.items.map(item => `
+              <tr>
+                ${pageCellHtml(item, firstColField, true)}
+                ${fields.map(([field]) => pageCellHtml(item, field)).join('')}
+              </tr>
+            `).join('')}
           </tbody>
         </table>
       </div>
@@ -774,9 +792,49 @@
       <div class="pill-row" id="page-selector" style="flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px">
         ${pages.map((p, idx) => `<button class="pill ${idx === refState.pageIndex ? 'active' : ''}" data-page="${idx}" style="white-space:nowrap">${pageShortLabel(p.label)}</button>`).join('')}
       </div>
+      <div class="zoom-row" id="zoom-controls">
+        <button class="btn secondary zoom-btn" type="button" id="zoom-out">−</button>
+        <span class="zoom-label" id="zoom-label">${Math.round(refState.zoom * 100)}%</span>
+        <button class="btn secondary zoom-btn" type="button" id="zoom-in">+</button>
+        <button class="btn secondary zoom-btn" type="button" id="zoom-reset" style="margin-left:auto">Reset</button>
+      </div>
       <div id="page-table-area">${renderPageTable(page)}</div>
       ${anyAnnotations ? '<button class="btn secondary block" id="clear-all-annotations" style="margin-top:12px">↺ Clear all notes &amp; highlights</button>' : ''}
     `;
+  }
+
+  // Re-renders only the table itself (not the whole Reference view), so the page you're on,
+  // the scroll position, and the zoom level all survive editing or coloring a cell.
+  function refreshPageTable() {
+    const pages = getPageGroups();
+    if (refState.pageIndex >= pages.length) refState.pageIndex = 0;
+    const page = pages[refState.pageIndex];
+    const area = document.getElementById('page-table-area');
+    const oldWrap = area.querySelector('.page-table-wrap');
+    const scrollLeft = oldWrap ? oldWrap.scrollLeft : 0;
+    area.innerHTML = renderPageTable(page);
+    const newWrap = area.querySelector('.page-table-wrap');
+    if (newWrap) newWrap.scrollLeft = scrollLeft;
+    const anyAnnotations = Object.keys(annotations).length > 0;
+    const clearAllBtn = document.getElementById('clear-all-annotations');
+    if (anyAnnotations && !clearAllBtn) {
+      area.insertAdjacentHTML('afterend', '<button class="btn secondary block" id="clear-all-annotations" style="margin-top:12px">↺ Clear all notes &amp; highlights</button>');
+      wireClearAllButton();
+    } else if (!anyAnnotations && clearAllBtn) {
+      clearAllBtn.remove();
+    }
+  }
+
+  function setZoom(z) {
+    refState.zoom = clampZoom(z);
+    const label = document.getElementById('zoom-label');
+    if (label) label.textContent = Math.round(refState.zoom * 100) + '%';
+    refreshPageTable();
+  }
+
+  function wireClearAllButton() {
+    const clearAllBtn = document.getElementById('clear-all-annotations');
+    if (clearAllBtn) clearAllBtn.addEventListener('click', () => { clearAllAnnotations(); refreshPageTable(); });
   }
 
   function wireReferencePagesListeners() {
@@ -788,6 +846,10 @@
       });
     });
 
+    document.getElementById('zoom-out').addEventListener('click', () => setZoom(refState.zoom - 0.1));
+    document.getElementById('zoom-in').addEventListener('click', () => setZoom(refState.zoom + 0.1));
+    document.getElementById('zoom-reset').addEventListener('click', () => setZoom(1));
+
     document.getElementById('page-table-area').addEventListener('click', e => {
       const actionBtn = e.target.closest('[data-cell-action]');
       if (actionBtn) {
@@ -795,24 +857,24 @@
         const id = cell.dataset.id, field = cell.dataset.field;
         if (actionBtn.dataset.cellAction === 'save') {
           const note = cell.querySelector('.cell-note-input').value.trim();
-          const highlight = cell.querySelector('.cell-highlight-input').checked;
-          setAnnotation(id, field, { note, highlight });
+          const colorInput = cell.querySelector('input[name="cell-color"]:checked');
+          const color = colorInput ? colorInput.value : '';
+          setAnnotation(id, field, { note, color });
         } else if (actionBtn.dataset.cellAction === 'clear') {
-          setAnnotation(id, field, { note: '', highlight: false });
+          setAnnotation(id, field, { note: '', color: '' });
         }
         refState.editingCell = null;
-        renderReference();
+        refreshPageTable();
         return;
       }
       const cell = e.target.closest('.page-cell:not(.editing-cell)');
       if (cell) {
         refState.editingCell = { id: cell.dataset.id, field: cell.dataset.field };
-        renderReference();
+        refreshPageTable();
       }
     });
 
-    const clearAllBtn = document.getElementById('clear-all-annotations');
-    if (clearAllBtn) clearAllBtn.addEventListener('click', () => { clearAllAnnotations(); renderReference(); });
+    wireClearAllButton();
   }
 
   function editableFieldsFor(item) {
