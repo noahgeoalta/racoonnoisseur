@@ -10,7 +10,8 @@ const WINES = [
   {
     id: 'wine-sette-roche',
     sourcePage: 'Wine List, p.1',
-    name: "Sette Roche Vino Spumante Extra Dry (Bubble)",
+    name: "Sette Roche Vino Spumante Extra Dry",
+    note: "Bubble",
     category: 'wine', subcategory: 'sparkling',
     varietal: 'Glera & Italian white blend (Sparkling)',
     region: 'Veneto, Italy',
@@ -21,7 +22,8 @@ const WINES = [
   {
     id: 'wine-cantina-soliera',
     sourcePage: 'Wine List, p.1',
-    name: 'Cantina di Soliera Lambrusco Salamino Semi-Dry (Bubble)',
+    name: 'Cantina di Soliera Lambrusco Salamino Semi-Dry',
+    note: 'Bubble',
     category: 'wine', subcategory: 'sparkling',
     varietal: 'Lambrusco, Salamino',
     region: 'Emilia-Romagna, Italy',
@@ -33,7 +35,8 @@ const WINES = [
   {
     id: 'wine-muralhas-rose',
     sourcePage: 'Wine List, p.1',
-    name: 'Muralhas de Monção "Muralhas Rosé" (Rose Sangria)',
+    name: 'Muralhas de Monção "Muralhas Rosé"',
+    note: 'Rose Sangria',
     category: 'wine', subcategory: 'rose',
     varietal: 'Alvarelhão & Pedral',
     region: 'Vinho Verde, Portugal',
@@ -44,7 +47,8 @@ const WINES = [
   {
     id: 'wine-sandro-de-bruno',
     sourcePage: 'Wine List, p.1',
-    name: 'Sandro De Bruno Pinot Grigio Ramato (Skin of grape in there longer = pinky)',
+    name: 'Sandro De Bruno Pinot Grigio Ramato',
+    note: 'Skin of grape in there longer = pinky',
     category: 'wine', subcategory: 'white',
     varietal: 'Pinot Grigio (skin-contact)',
     region: 'Veneto, Italy',
@@ -55,7 +59,8 @@ const WINES = [
   {
     id: 'wine-cantina-levorato',
     sourcePage: 'Wine List, p.1',
-    name: 'Cantina Levorato Pinot Grigio (White)',
+    name: 'Cantina Levorato Pinot Grigio',
+    note: 'White',
     category: 'wine', subcategory: 'white',
     varietal: 'Pinot Grigio',
     region: 'Veneto, Italy',
@@ -66,7 +71,8 @@ const WINES = [
   {
     id: 'wine-nuestro-verdejo',
     sourcePage: 'Wine List, p.1',
-    name: 'Nuestro Verdejo (White)',
+    name: 'Nuestro Verdejo',
+    note: 'White',
     category: 'wine', subcategory: 'white',
     varietal: 'Verdejo',
     region: 'Rueda, Spain',
@@ -77,7 +83,8 @@ const WINES = [
   {
     id: 'wine-jackson-estate',
     sourcePage: 'Wine List, p.1',
-    name: 'Jackson Estate "Stitch" Sauvignon Blanc (White)',
+    name: 'Jackson Estate "Stitch" Sauvignon Blanc',
+    note: 'White',
     category: 'wine', subcategory: 'white',
     varietal: 'Sauvignon Blanc',
     region: 'Marlborough, New Zealand',
@@ -88,7 +95,8 @@ const WINES = [
   {
     id: 'wine-lafazanis-geometria',
     sourcePage: 'Wine List, p.1',
-    name: 'Lafazanis "Geometria" Sauvignon Blanc (White)',
+    name: 'Lafazanis "Geometria" Sauvignon Blanc',
+    note: 'White',
     category: 'wine', subcategory: 'white',
     varietal: 'Moschofilero',
     region: 'Peloponnese, Greece',
@@ -100,7 +108,8 @@ const WINES = [
   {
     id: 'wine-featherstone-riesling',
     sourcePage: 'Wine List, p.1',
-    name: 'Featherstone Estate "Black Sheep" Riesling (White)',
+    name: 'Featherstone Estate "Black Sheep" Riesling',
+    note: 'White',
     category: 'wine', subcategory: 'white',
     varietal: 'Riesling',
     region: 'Niagara Peninsula, Ontario',
@@ -111,7 +120,8 @@ const WINES = [
   {
     id: 'wine-novellum-chardonnay',
     sourcePage: 'Wine List, p.1',
-    name: 'Novellum Chardonnay (White)',
+    name: 'Novellum Chardonnay',
+    note: 'White',
     category: 'wine', subcategory: 'white',
     varietal: 'Chardonnay',
     region: 'Languedoc-Roussillon, France',
@@ -302,7 +312,7 @@ const COCKTAILS = [
   {
     id: 'cocktail-kiwinichiwa-mojito',
     sourcePage: 'Menu Knowledge, p.1',
-    name: "Kiwi'nichiwa (Mojito)",
+    name: "Kiwi'nichiwa Mojito",
     category: 'cocktail', subcategory: 'mojito',
     blurb: "you'll never ask for a standard mojito again - after you've had this. Insert Sake, kiwi, rum, mint, you'll feel refreshed all summer long.",
     composition: "(Diplomatico Secret Barrel White Rum), sake, kiwi syrup, kiwi's, lime juice, mint, soda.",
@@ -313,7 +323,8 @@ const COCKTAILS = [
   {
     id: 'cocktail-berry-smooth-operator',
     sourcePage: 'Menu Knowledge, p.2',
-    name: 'Berry Smooth Operator (Tequila Sour)',
+    name: 'Berry Smooth Operator',
+    note: 'Tequila Sour',
     category: 'cocktail', subcategory: 'signature',
     blurb: 'Refreshing, smooth, well balanced. Pineapple & lemon for brightness, silky foam, if you like a tequila sour, you\'ll enjoy this.',
     composition: 'Cimmaron Blanco Tequila, blueberry syrup, pineapple & lemon juice, egg whites.',
@@ -346,7 +357,8 @@ const COCKTAILS = [
   {
     id: 'cocktail-totally-wired',
     sourcePage: 'Menu Knowledge, p.2',
-    name: 'Totally Wired (Espresso on every step)',
+    name: 'Totally Wired',
+    note: 'Espresso on every step',
     category: 'cocktail', subcategory: 'signature',
     blurb: "doing what we do best, challenging the norm for espresso martinis - here's one packed with flavour and not with just a caffeine kick either.",
     composition: 'Espresso-infused Cimmaron Blanco, Alma Tepec, Black Diamond Coffee Liqueur, Grand Marnier, espresso, simple syrup, dash of black pepper tincture.',
@@ -379,7 +391,8 @@ const COCKTAILS = [
   {
     id: 'cocktail-playing-with-fire',
     sourcePage: 'Menu Knowledge, p.5',
-    name: 'Playing with Fire (Smoky)',
+    name: 'Playing with Fire',
+    note: 'Smoky',
     category: 'cocktail', subcategory: 'whiskey',
     blurb: 'A classic with a twist — enjoy a great old fashioned with a smoky flavour.',
     composition: 'Woodford Reserve, sugar cube, aromatic Middleton (Stony Plain) bitters, dark cherry, and orange.',
@@ -566,7 +579,8 @@ const FOOD = [
   {
     id: 'food-sui-mai',
     sourcePage: 'Menu Knowledge, p.8',
-    name: 'Sui Mai (Come in 3, can add 1)',
+    name: 'Sui Mai',
+    note: 'Come in 3, can add 1',
     category: 'food', subcategory: 'starter',
     blurb: '(NOT GF) Juicy pork and shrimp dumpling, cradled in a steamed wonton wrapper — guest favourite since day one.',
     composition: 'Grove City ground pork & prawn dumpling, wonton wrapper, pickled fresno, truffle aioli, chili crunch, cilantro, crispy shallots.',
@@ -588,7 +602,8 @@ const FOOD = [
   {
     id: 'food-smoked-wings',
     sourcePage: 'Menu Knowledge, p.7',
-    name: 'Smoked Wings (Can oven bake)',
+    name: 'Smoked Wings',
+    note: 'Can oven bake',
     category: 'food', subcategory: 'starter',
     blurb: "No need to decide between wing or flat — we give you it all.",
     composition: 'Sweet chili + ginger glaze, blue cheese/ranch dressing.',
@@ -599,7 +614,8 @@ const FOOD = [
   {
     id: 'food-goat-cheese-croquettes',
     sourcePage: 'Menu Knowledge, p.7',
-    name: 'Goat Cheese Croquettes (Can add another)',
+    name: 'Goat Cheese Croquettes',
+    note: 'Can add another',
     category: 'food', subcategory: 'starter',
     blurb: 'Warm cheese with a little spice and a refreshing twist.',
     composition: 'Fried goat cheese, pistachio crumb, hot honey glaze, pickled strawberries.',
@@ -610,7 +626,8 @@ const FOOD = [
   {
     id: 'food-barbaretta-board',
     sourcePage: 'Menu Knowledge, p.7',
-    name: 'Barbaretta Board (Cheese stays, Meat rotates)',
+    name: 'Barbaretta Board',
+    note: 'Cheese stays, Meat rotates',
     category: 'food', subcategory: 'starter',
     blurb: 'A mix of made-in-house and local — featuring cheeses from Barbaretta and Lakeside, accompanied with meats from Brickhouse.',
     composition: 'Lakeside alpine, chaga, and Barbaretta ricotta. Brickhouse jerky, rotating Brickhouse Sausage and Pepperoni, pickled veg, house jam, grainy mustard, olives, and a Barbaretta cracker.',

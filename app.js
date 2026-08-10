@@ -289,6 +289,7 @@
             <span class="badge ${badgeClass(item)}">${categoryLabel(item)}</span>
             <div class="card-name">${escapeHtml(item.name)}</div>
             <div class="card-sub">${escapeHtml(item.varietal ? item.varietal + ' · ' + item.region : '')}</div>
+            ${item.note ? `<div class="card-note">${escapeHtml(item.note)}</div>` : ''}
             <div class="tap-hint">Tap card to flip</div>
           </div>
           <div class="flip-face back">
@@ -793,6 +794,7 @@
     return `
       <${tag} class="page-cell ${colorClass}${headClass}" data-id="${item.id}" data-field="${field}">
         <div class="page-cell-value">${escapeHtml(value)}</div>
+        ${asHeader && item.note ? `<div class="page-cell-tag">${escapeHtml(item.note)}</div>` : ''}
         ${ann && ann.note ? `<div class="page-cell-note">📝 ${escapeHtml(ann.note)}</div>` : ''}
       </${tag}>
     `;
@@ -926,12 +928,12 @@
   function editableFieldsFor(item) {
     if (item.category === 'wine') {
       return [
-        ['name', 'Name'], ['varietal', 'Varietal'], ['region', 'Region'],
+        ['name', 'Name'], ['note', 'Note / Tag'], ['varietal', 'Varietal'], ['region', 'Region'],
         ['blurb', 'Flavour Profile'], ['pairings', 'Food Pairings']
       ];
     }
     return [
-      ['name', 'Name'], ['blurb', 'Story & Flavour'], ['composition', 'Composition'],
+      ['name', 'Name'], ['note', 'Note / Tag'], ['blurb', 'Story & Flavour'], ['composition', 'Composition'],
       ['allergens', 'Allergens'], ['preset', 'Garnish / Preset']
     ];
   }
@@ -966,6 +968,7 @@
           <h3>${escapeHtml(item.name)}${edited ? ' <span class="badge">edited</span>' : ''}</h3>
           <span class="badge ${badgeClass(item)}">${categoryLabel(item)}</span>
         </div>
+        ${item.note ? `<div class="ref-item-note">${escapeHtml(item.note)}</div>` : ''}
         ${studyBackHtml(item)}
         <button class="btn secondary block" data-action="start-edit" style="margin-top:6px">✏️ Fix a detail</button>
       </div>
@@ -977,7 +980,7 @@
     let items = refState.category === 'all' ? LIVE_ITEMS : LIVE_ITEMS.filter(i => i.category === refState.category);
     if (refState.search.trim()) {
       const q = refState.search.trim().toLowerCase();
-      items = items.filter(i => [i.name, i.composition, i.blurb, i.varietal, i.region, i.pairings, i.allergens]
+      items = items.filter(i => [i.name, i.note, i.composition, i.blurb, i.varietal, i.region, i.pairings, i.allergens]
         .filter(Boolean).some(f => f.toLowerCase().includes(q)));
     }
     const anyEdits = Object.keys(overrides).length > 0;
