@@ -289,6 +289,7 @@
             <span class="badge ${badgeClass(item)}">${categoryLabel(item)}</span>
             <div class="card-name">${escapeHtml(item.name)}</div>
             <div class="card-sub">${escapeHtml(item.varietal ? item.varietal + ' · ' + item.region : '')}</div>
+            ${item.note ? `<div class="card-note">${escapeHtml(item.note)}</div>` : ''}
             <div class="tap-hint">Tap card to flip</div>
           </div>
           <div class="flip-face back">
@@ -412,8 +413,18 @@
     );
   }
 
+  // Skip questions whose answer is already spelled out in the item's own name
+  // (e.g. asking the varietal of the "... Sauvignon Blanc" wine) — not a real test of memory.
+  function answerGivenAwayByName(item, answerText) {
+    if (!answerText) return false;
+    const name = item.name.toLowerCase();
+    const cleaned = answerText.toLowerCase().replace(/\([^)]*\)/g, '');
+    const parts = cleaned.split(/[,&/]| and | with /).map(s => s.trim()).filter(s => s.length >= 4);
+    return parts.some(p => name.includes(p));
+  }
+
   function genWineVarietal(item, pool) {
-    if (item.category !== 'wine') return null;
+    if (item.category !== 'wine' || answerGivenAwayByName(item, item.varietal)) return null;
     const distractors = pickSmartDistractors(item, pool, 'varietal', 3);
     return buildMC(
       `A guest asks what varietal the <b>${escapeHtml(item.name)}</b> is. What's the answer?`,
@@ -474,10 +485,14 @@
     );
   }
 
+  // Flavour-alike suggestions stay within the same category (another wine, another
+  // cocktail, another dish) — a cocktail is never surfaced as something that "pairs"
+  // with a wine or a dish; that's what the dedicated pairing questions are for.
   function genFlavorAlike(item, pool) {
     if (!item.tags || item.tags.length === 0) return null;
-    const alike = pool.filter(i => i.id !== item.id && i.tags && i.tags.some(t => item.tags.includes(t)));
-    const different = pool.filter(i => i.id !== item.id && (!i.tags || !i.tags.some(t => item.tags.includes(t))));
+    const sameCat = pool.filter(i => i.id !== item.id && i.category === item.category);
+    const alike = sameCat.filter(i => i.tags && i.tags.some(t => item.tags.includes(t)));
+    const different = sameCat.filter(i => !i.tags || !i.tags.some(t => item.tags.includes(t)));
     if (alike.length < 1 || different.length < 3) return null;
     const correct = sample(alike, 1)[0];
     const distractors = sample(different, 3).map(i => i.name);
@@ -488,10 +503,42 @@
     );
   }
 
+  // Wine <-> food pairing, cross-referenced to real menu items rather than free text.
+  // Both stay dormant (return null) until each wine's `pairsWithFoodIds` is populated in
+  // data.js with confirmed matches — no guessing which dish a wine's pairing note means.
+  function genWineFoodPairing(item, pool) {
+    if (item.category !== 'wine' || !item.pairsWithFoodIds || item.pairsWithFoodIds.length === 0) return null;
+    const correct = pool.find(i => i.id === sample(item.pairsWithFoodIds, 1)[0]);
+    if (!correct) return null;
+    const distractorPool = pool.filter(i => i.category === 'food' && !item.pairsWithFoodIds.includes(i.id));
+    if (distractorPool.length < 3) return null;
+    const distractors = sample(distractorPool, 3).map(i => i.name);
+    return buildMC(
+      `A guest orders the <b>${escapeHtml(item.name)}</b>. Which dish on the menu would you recommend pairing it with?`,
+      correct.name, distractors,
+      `${item.name} pairs with: ${item.pairings}`
+    );
+  }
+
+  function genFoodWinePairing(item, pool) {
+    if (item.category !== 'food') return null;
+    const matches = pool.filter(i => i.category === 'wine' && i.pairsWithFoodIds && i.pairsWithFoodIds.includes(item.id));
+    if (matches.length === 0) return null;
+    const correct = sample(matches, 1)[0];
+    const distractorPool = pool.filter(i => i.category === 'wine' && !matches.some(m => m.id === i.id));
+    if (distractorPool.length < 3) return null;
+    const distractors = sample(distractorPool, 3).map(i => i.name);
+    return buildMC(
+      `A guest orders the <b>${escapeHtml(item.name)}</b>. Which wine on the list would you recommend pairing it with?`,
+      correct.name, distractors,
+      `${correct.name} pairs with: ${correct.pairings}`
+    );
+  }
+
   const GENERATORS_BY_CATEGORY = {
-    wine: [genWineVarietal, genWinePairing, genNameFromBlurb, genFlavorAlike],
+    wine: [genWineVarietal, genWinePairing, genWineFoodPairing, genNameFromBlurb, genFlavorAlike],
     cocktail: [genComposition, genAllergen, genPreset, genNameFromBlurb, genFlavorAlike],
-    food: [genComposition, genAllergen, genPreset, genNameFromBlurb, genFlavorAlike]
+    food: [genComposition, genAllergen, genPreset, genFoodWinePairing, genNameFromBlurb, genFlavorAlike]
   };
 
   function generateQuestionForItem(item, pool) {
@@ -747,6 +794,7 @@
     return `
       <${tag} class="page-cell ${colorClass}${headClass}" data-id="${item.id}" data-field="${field}">
         <div class="page-cell-value">${escapeHtml(value)}</div>
+        ${asHeader && item.note ? `<div class="page-cell-tag">${escapeHtml(item.note)}</div>` : ''}
         ${ann && ann.note ? `<div class="page-cell-note">📝 ${escapeHtml(ann.note)}</div>` : ''}
       </${tag}>
     `;
@@ -880,12 +928,12 @@
   function editableFieldsFor(item) {
     if (item.category === 'wine') {
       return [
-        ['name', 'Name'], ['varietal', 'Varietal'], ['region', 'Region'],
+        ['name', 'Name'], ['note', 'Note / Tag'], ['varietal', 'Varietal'], ['region', 'Region'],
         ['blurb', 'Flavour Profile'], ['pairings', 'Food Pairings']
       ];
     }
     return [
-      ['name', 'Name'], ['blurb', 'Story & Flavour'], ['composition', 'Composition'],
+      ['name', 'Name'], ['note', 'Note / Tag'], ['blurb', 'Story & Flavour'], ['composition', 'Composition'],
       ['allergens', 'Allergens'], ['preset', 'Garnish / Preset']
     ];
   }
@@ -920,6 +968,7 @@
           <h3>${escapeHtml(item.name)}${edited ? ' <span class="badge">edited</span>' : ''}</h3>
           <span class="badge ${badgeClass(item)}">${categoryLabel(item)}</span>
         </div>
+        ${item.note ? `<div class="ref-item-note">${escapeHtml(item.note)}</div>` : ''}
         ${studyBackHtml(item)}
         <button class="btn secondary block" data-action="start-edit" style="margin-top:6px">✏️ Fix a detail</button>
       </div>
@@ -931,7 +980,7 @@
     let items = refState.category === 'all' ? LIVE_ITEMS : LIVE_ITEMS.filter(i => i.category === refState.category);
     if (refState.search.trim()) {
       const q = refState.search.trim().toLowerCase();
-      items = items.filter(i => [i.name, i.composition, i.blurb, i.varietal, i.region, i.pairings, i.allergens]
+      items = items.filter(i => [i.name, i.note, i.composition, i.blurb, i.varietal, i.region, i.pairings, i.allergens]
         .filter(Boolean).some(f => f.toLowerCase().includes(q)));
     }
     const anyEdits = Object.keys(overrides).length > 0;
