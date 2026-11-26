@@ -601,7 +601,7 @@
     bindGuestMode();
     const r = document.getElementById('guest-reveal');
     if (r) r.addEventListener('click', () => { guestState.revealed = true; renderGuest(); });
-    document.getElementById('guest-next').addEventListener('click', () => { newPractice(); renderGuest(); window.scrollTo(0, 0); });
+    document.getElementById('guest-next').addEventListener('click', () => { newPractice(); renderGuest(); root.scrollTop = 0; });
   }
 
   function bindGuestMode() {
@@ -788,7 +788,7 @@
   function answerGivenAwayByName(item, answerText) {
     if (!answerText) return false;
     const name = item.name.toLowerCase();
-    const cleaned = answerText.toLowerCase().replace(/\([^)]*\)/g, '');
+    const cleaned = answerText.toLowerCase().replace(/[()]/g, ',');
     const parts = cleaned.split(/[,&/]| and | with /).map(s => s.trim()).filter(s => s.length >= 4);
     return parts.some(p => name.includes(p));
   }
@@ -881,8 +881,8 @@
     const comp = item.composition.toLowerCase();
     const sameSub = pool.filter(i => i.id !== item.id && i.category === item.category && i.subcategory === item.subcategory);
     const sameCat = pool.filter(i => i.id !== item.id && i.category === item.category);
-    let others = [...new Set(sameSub.flatMap(i => distinctiveIngredients(i, pool)))].filter(x => !comp.includes(x));
-    if (others.length < 3) others = [...new Set(sameCat.flatMap(i => distinctiveIngredients(i, pool)))].filter(x => !comp.includes(x));
+    let others = [...new Set(sameSub.flatMap(i => distinctiveIngredients(i, pool)))].filter(x => !comp.includes(x) && !leaksName(item, x));
+    if (others.length < 3) others = [...new Set(sameCat.flatMap(i => distinctiveIngredients(i, pool)))].filter(x => !comp.includes(x) && !leaksName(item, x));
     const distractors = sample(others, 3);
     return buildMC(
       `Which of these is <b>in</b> ${theName(item)}?`,
@@ -899,7 +899,8 @@
     const near = pool.filter(i => i.id !== item.id && i.category === item.category && i.subcategory === item.subcategory);
     const sameCat = pool.filter(i => i.id !== item.id && i.category === item.category);
     const fromPool = list => [...new Set(list.flatMap(i => distinctiveIngredients(i, pool)))].filter(x => !comp.includes(x));
-    const outsider = sample(fromPool(near).length ? fromPool(near) : fromPool(sameCat), 1)[0];
+    const clean = list => fromPool(list).filter(x => !leaksName(item, x));
+    const outsider = sample(clean(near).length ? clean(near) : clean(sameCat), 1)[0];
     if (!outsider) return null;
     return buildMC(
       `Which of these is <b>NOT</b> in ${theName(item)}?`,
@@ -945,11 +946,11 @@
   function genGuestScenario(item, pool) {
     if (item.category === 'wine' || !quizzable(item)) return null;
     const fits = shuffle(GUEST_TOPICS.filter(t => !['share', 'dessert', 'popular', 'light-white', 'bold-red'].includes(t.id)))
-      .filter(t => { const w = t.match(item); return w && !/cross-contamination/.test(w); });
+      .filter(t => { const w = t.match(item); return w && !/cross-contamination/.test(w) && !t.quotes.some(qt => leaksName(item, qt)); });
     for (const t of fits) {
       const sameCat = pool.filter(i => i.id !== item.id && i.category === item.category && quizzable(i));
       const allergen = ALLERGY_TOPICS[t.id];
-      const wrong = sameCat.filter(i => allergen ? new RegExp(allergen, 'i').test(i.allergens || '') : !t.match(i));
+      const wrong = sameCat.filter(i => !t.quotes.some(qt => leaksName(i, qt))).filter(i => allergen ? new RegExp(allergen, 'i').test(i.allergens || '') : !t.match(i));
       if (wrong.length < 3) continue;
       const kind = item.category === 'food' ? (item.subcategory === 'sauce' ? 'add-on' : 'dish') : 'drink';
       const ask = allergen
@@ -1554,6 +1555,10 @@
   }
 
   /* ============================ init ============================ */
+
+  document.addEventListener('focusout', e => {
+    if (e.target.matches && e.target.matches('input, textarea')) setTimeout(() => window.scrollTo(0, 0), 50);
+  });
 
   initGate(() => { switchView('study'); setTimeout(() => showLoveNote(false), 1200); });
 })();

@@ -29,11 +29,14 @@ html, body {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* App shell: the page itself never scrolls (so iOS can't drag the header away);
+   only the content area between the header and tab bar scrolls. */
+html, body { height: 100%; overflow: hidden; }
 body {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
 }
 
 h1, h2, h3 { font-family: 'Fraunces', Georgia, 'Times New Roman', serif; margin: 0; }
@@ -91,8 +94,7 @@ body {
   border-bottom: 1px solid var(--border);
   /* Clear the iPhone status bar / Dynamic Island (status bar is translucent) */
   padding: calc(14px + var(--safe-top)) calc(18px + var(--safe-right)) 12px calc(18px + var(--safe-left));
-  position: sticky;
-  top: 0;
+  flex: none;
   z-index: 10;
 }
 
@@ -103,6 +105,10 @@ body {
 
 .view-root {
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
   padding: 16px calc(16px + var(--safe-right)) calc(90px + var(--safe-bottom)) calc(16px + var(--safe-left));
   max-width: 720px;
   width: 100%;
