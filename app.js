@@ -742,7 +742,7 @@
 
   function getPageGroups() {
     const winePages = ['Wine List, p.1', 'Wine List, p.2', 'Wine List, p.3'];
-    const menuPages = Array.from({ length: 11 }, (_, i) => `Menu Knowledge, p.${i + 1}`);
+    const menuPages = Array.from({ length: 13 }, (_, i) => `Menu Knowledge, p.${i + 1}`);
     const pages = [];
     winePages.forEach(label => pages.push({
       label, type: 'wine',
@@ -752,12 +752,12 @@
       label, type: 'menu',
       items: LIVE_ITEMS.filter(i => (i.category === 'cocktail' || i.category === 'food') && i.sourcePage === label)
     }));
-    pages.push({ label: 'Menu Knowledge, p.12', type: 'liquors', items: WELL_LIQUORS });
+    pages.push({ label: 'Well & Beer (Menu p.6)', type: 'liquors', items: WELL_LIQUORS });
     return pages;
   }
 
   function pageShortLabel(label) {
-    return label.replace('Wine List, ', 'Wine ').replace('Menu Knowledge, ', 'Menu ');
+    return label.replace('Wine List, ', 'Wine ').replace('Menu Knowledge, ', 'Menu ').replace('Well & Beer (Menu p.6)', 'Well & Beer');
   }
 
   const CELL_COLORS = [['', 'None'], ['gold', 'Gold'], ['green', 'Know it'], ['red', 'Review']];
