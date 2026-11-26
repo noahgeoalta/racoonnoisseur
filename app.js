@@ -42,7 +42,8 @@
     'book': '<path d="M3 5c3-1.5 6-1.5 9 1 3-2.5 6-2.5 9-1v14c-3-1.5-6-1.5-9 1-3-2.5-6-2.5-9-1z"/><path d="M12 6v14"/>',
     'heart': '<path d="M12 20s-8-5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 9c0 6-8 11-8 11z"/>',
     'check': '<path d="M5 12.5l4.5 4.5L19 7"/>',
-    'x': '<path d="M6 6l12 12M18 6L6 18"/>'
+    'x': '<path d="M6 6l12 12M18 6L6 18"/>',
+    'flag': '<path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/>'
   };
   function icon(name, cls = '') {
     return `<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name] || ''}</svg>`;
@@ -81,6 +82,127 @@
       if (taps.length >= 5) { taps = []; showLoveNote(true); }
     });
   })();
+
+  /* ============================ problem reports ============================ */
+  // "Report a problem": builds a plain-text report with full context (screen,
+  // question/item, version, device, recent errors) and opens the phone's share
+  // sheet so it can be texted over and pasted into a fix session.
+  const APP_VERSION = '20261126d';
+  const recentErrors = [];
+  function logError(msg) {
+    recentErrors.push(`${new Date().toISOString().slice(11, 19)} ${String(msg).slice(0, 300)}`);
+    if (recentErrors.length > 8) recentErrors.shift();
+  }
+  window.addEventListener('error', e => logError(`${e.message} @ ${(e.filename || '').split('/').pop()}:${e.lineno}`));
+  window.addEventListener('unhandledrejection', e => logError(`Promise: ${(e.reason && e.reason.message) || e.reason}`));
+
+  const REPORT_TYPES = [
+    ['wrong-info', 'Wrong menu info'],
+    ['bad-question', 'Bad or confusing question'],
+    ['broken', 'Something looks broken'],
+    ['idea', 'Idea / request'],
+    ['other', 'Other']
+  ];
+  const stripHtml = s => String(s || '').replace(/<[^>]+>/g, '').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&').trim();
+
+  // Snapshot of what's on screen, so the report says exactly where the problem was.
+  function reportContext(focus) {
+    const lines = [`View: ${currentView}`];
+    if (currentView === 'quiz' && quizState.phase === 'active' && quizState.queue.length) {
+      const q = quizState.queue[quizState.index];
+      if (q) {
+        lines.push(`Question ${quizState.index + 1}/${quizState.queue.length}: ${stripHtml(q.prompt)}`);
+        q.options.forEach((o, i) => lines.push(`  ${o.correct ? '[correct]' : '[ ]'} ${o.text}${quizState.selected === i ? '   <- she picked' : ''}`));
+        lines.push(`Item: ${q.itemName} (${q.itemId})`);
+      }
+    } else if (currentView === 'study') {
+      const it = itemById(studyState.order[studyState.index]);
+      if (it) lines.push(`Card: ${it.name} (${it.id})`);
+    } else if (currentView === 'guest') {
+      if (guestState.mode === 'practice') lines.push(`Practice: "${guestState.quote}" (${guestState.practiceId})`);
+      else if (guestState.topicId) lines.push(`Topic: ${guestState.topicId}`);
+      else if (guestState.query) lines.push(`Searched: "${guestState.query}"`);
+    } else if (currentView === 'reference') {
+      lines.push(`Mode: ${refState.mode}${refState.search ? `, search "${refState.search}"` : ''}`);
+    }
+    if (focus) lines.push(`Flagged: ${focus}`);
+    return lines;
+  }
+
+  function buildReport(type, note, focus) {
+    const label = (REPORT_TYPES.find(t => t[0] === type) || ['', 'Other'])[1];
+    return [
+      'RACCOONNOISSEUR PROBLEM REPORT',
+      `Type: ${label}`,
+      `Note: ${note || '(none)'}`,
+      '',
+      ...reportContext(focus),
+      '',
+      `Version: ${APP_VERSION} · ${new Date().toLocaleString()}`,
+      `Device: ${navigator.userAgent.replace(/^Mozilla\/5\.0 /, '').slice(0, 140)}`,
+      `Size: ${window.innerWidth}x${window.innerHeight} · home-screen app: ${isHomeScreenApp() ? 'yes' : 'no'}`,
+      `Recent errors: ${recentErrors.length ? '\n  ' + recentErrors.join('\n  ') : 'none'}`
+    ].join('\n');
+  }
+
+  async function sendReport(text) {
+    if (navigator.share) {
+      try { await navigator.share({ text }); return 'shared'; }
+      catch (e) { if (e && e.name === 'AbortError') return 'cancelled'; }
+    }
+    try { await navigator.clipboard.writeText(text); return 'copied'; } catch (e) { /* fall through */ }
+    return 'manual';
+  }
+
+  function openReport(focus, presetType) {
+    const existing = document.querySelector('.report-sheet');
+    if (existing) existing.remove();
+    let type = presetType || (currentView === 'quiz' ? 'bad-question' : 'wrong-info');
+    const wrap = document.createElement('div');
+    wrap.className = 'report-sheet';
+    wrap.innerHTML = `
+      <div class="report-backdrop" data-close></div>
+      <div class="report-panel" role="dialog" aria-modal="true" aria-label="Report a problem">
+        <div class="report-head">
+          ${mascot('notepad', 'mascot-sm')}
+          <div><h3>Report a problem</h3><p>What's wrong? The details of this screen are added automatically.</p></div>
+          <button class="report-x" data-close aria-label="Close">${icon('x')}</button>
+        </div>
+        <div class="pill-row" id="report-types">
+          ${REPORT_TYPES.map(([k, l]) => `<button class="pill ${k === type ? 'active' : ''}" data-type="${k}">${l}</button>`).join('')}
+        </div>
+        <textarea class="search-input" id="report-note" rows="3" placeholder="Optional, e.g. &quot;this answer is wrong, it has whiskey not vodka&quot;"></textarea>
+        <details class="report-preview"><summary>What gets sent</summary><pre id="report-pre"></pre></details>
+        <button class="btn block" id="report-send">${icon('chat')}Send to my boyfriend</button>
+        <p class="report-status" id="report-status"></p>
+      </div>`;
+    document.body.appendChild(wrap);
+    const note = wrap.querySelector('#report-note');
+    const pre = wrap.querySelector('#report-pre');
+    const refresh = () => { pre.textContent = buildReport(type, note.value.trim(), focus); };
+    refresh();
+    note.addEventListener('input', refresh);
+    wrap.querySelectorAll('[data-type]').forEach(b => b.addEventListener('click', () => {
+      type = b.dataset.type;
+      wrap.querySelectorAll('[data-type]').forEach(x => x.classList.toggle('active', x === b));
+      refresh();
+    }));
+    const close = () => wrap.remove();
+    wrap.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', close));
+    wrap.querySelector('#report-send').addEventListener('click', async () => {
+      const text = buildReport(type, note.value.trim(), focus);
+      const status = wrap.querySelector('#report-status');
+      const result = await sendReport(text);
+      if (result === 'shared') { status.textContent = 'Sent, thank you!'; setTimeout(close, 900); }
+      else if (result === 'copied') status.textContent = 'Copied! Paste it into a text to him.';
+      else if (result === 'manual') { status.textContent = 'Long-press the text above to copy it, then text it to him.'; wrap.querySelector('.report-preview').open = true; }
+    });
+  }
+
+  document.addEventListener('click', e => {
+    const b = e.target.closest('[data-report]');
+    if (b) { e.preventDefault(); openReport(b.dataset.report || '', b.dataset.reportType); }
+  });
 
   /* ============================ love notes ============================ */
   // Little notes from the boyfriend. They pop up now and then when the app is
@@ -562,6 +684,7 @@
         ${active ? `<h3 class="guest-h">${icon(active.icon)}${active.label}</h3>${topicAnswerHtml(active)}`
           : matched.length ? matched.map(t => `<h3 class="guest-h">${icon(t.icon)}${t.label}</h3>${topicAnswerHtml(t)}`).join('')
           : guestState.query ? freeTextHtml(guestState.query) : ''}
+        ${active || guestState.query ? `<button class="report-link center" data-report="these guest answers">${icon('flag')}Something wrong or missing here?</button>` : ''}
       </div>
     `;
     bindGuestMode();
@@ -595,7 +718,7 @@
       </div>
       <p class="guest-prompt">How would you answer? Say it out loud — which items, and where on the menu?</p>
       ${guestState.revealed
-        ? `<h3 class="guest-h">${icon(t.icon)}${t.label}</h3>${topicAnswerHtml(t)}<button class="btn block" id="guest-next" style="margin-top:14px">Next guest ${icon('next')}</button>`
+        ? `<h3 class="guest-h">${icon(t.icon)}${t.label}</h3>${topicAnswerHtml(t)}<button class="report-link center" data-report="this practice answer">${icon('flag')}Something wrong here?</button><button class="btn block" id="guest-next" style="margin-top:14px">Next guest ${icon('next')}</button>`
         : `<button class="btn block" id="guest-reveal">Reveal answer</button><button class="btn secondary block" id="guest-next" style="margin-top:10px">Skip</button>`}
     `;
     bindGuestMode();
@@ -1138,6 +1261,7 @@
     quizState.answered = true;
     const q = quizState.queue[quizState.index];
     const chosen = q.options[idx];
+    quizState.selected = idx;
     const correct = chosen.correct;
 
     if (correct) quizState.score++;
@@ -1157,11 +1281,13 @@
         ${mascot(correct ? sample(['laugh', 'love', 'happy'], 1)[0] : 'surprised', 'mascot-fb ' + (correct ? 'pop' : 'shake'))}
         <div><b class="fb-head">${icon(correct ? 'check' : 'x')}${correct ? 'Correct!' : 'Not quite.'}</b><br>${escapeHtml(q.explanation)}</div>
       </div>
+      <button class="report-link" data-report="this quiz question">${icon('flag')}Report this question</button>
       <button class="btn block" id="quiz-next" style="margin-top:14px">${quizState.index + 1 < quizState.queue.length ? `Next Question ${icon('next')}` : 'See Results'}</button>
     `;
     document.getElementById('quiz-next').addEventListener('click', () => {
       quizState.index++;
       quizState.answered = false;
+      quizState.selected = null;
       if (quizState.index >= quizState.queue.length) quizState.phase = 'summary';
       renderQuiz();
     });

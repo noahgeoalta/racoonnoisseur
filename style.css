@@ -98,7 +98,8 @@ body {
   z-index: 10;
 }
 
-.brand { display: flex; align-items: center; gap: 10px; }
+.app-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .brand-emoji { font-size: 30px; line-height: 1; }
 .brand-text h1 { font-size: 20px; color: var(--gold-bright); letter-spacing: 0.3px; }
 .brand-text p { margin: 2px 0 0; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; }
@@ -604,3 +605,37 @@ body {
 @keyframes love-out { to { transform: translateY(-120%); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .love-note, .love-note.leaving { animation: none; } }
 .ic.flip { transform: scaleX(-1); }
+
+/* ---------- Problem reports ---------- */
+.header-report {
+  flex: none; display: inline-flex; align-items: center; gap: 2px;
+  background: transparent; color: var(--muted); border: 1px solid var(--border);
+  border-radius: 999px; padding: 6px 10px; font: inherit; font-size: 12px; cursor: pointer;
+}
+.header-report .ic { margin-right: 4px; }
+.header-report:active { color: var(--gold-bright); border-color: var(--gold); }
+.report-link {
+  display: inline-flex; align-items: center; background: none; border: 0; padding: 8px 0 0;
+  color: var(--muted); font: inherit; font-size: 13px; text-decoration: underline; text-underline-offset: 3px; cursor: pointer;
+}
+.report-link.center { display: flex; margin: 10px auto 0; }
+.report-sheet { position: fixed; inset: 0; z-index: 150; display: flex; align-items: flex-end; justify-content: center; }
+.report-backdrop { position: absolute; inset: 0; background: rgba(15,6,5,.6); animation: fade-in .2s both; }
+.report-panel {
+  position: relative; width: 100%; max-width: 520px; max-height: 88dvh; overflow-y: auto;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px 20px 0 0;
+  padding: 16px calc(16px + var(--safe-right)) calc(18px + var(--safe-bottom)) calc(16px + var(--safe-left));
+  animation: sheet-up .3s cubic-bezier(.2,1.2,.4,1) both;
+}
+.report-head { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; padding-right: 30px; }
+.report-head h3 { color: var(--gold-bright); font-size: 19px; }
+.report-head p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+.report-x { position: absolute; top: 12px; right: 12px; background: none; border: 0; color: var(--muted); padding: 6px; cursor: pointer; }
+.report-x .ic { margin: 0; }
+#report-note { resize: vertical; min-height: 70px; }
+.report-preview { margin: -4px 0 12px; font-size: 12px; color: var(--muted); }
+.report-preview summary { cursor: pointer; }
+.report-preview pre { white-space: pre-wrap; word-break: break-word; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-size: 11px; color: var(--cream); user-select: text; -webkit-user-select: text; }
+.report-status { text-align: center; color: var(--gold-bright); font-size: 13px; min-height: 18px; margin: 10px 0 0; }
+@keyframes sheet-up { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }

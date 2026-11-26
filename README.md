@@ -10,6 +10,12 @@ A phone-friendly study tool for memorizing a restaurant's menu — wine list, co
 - **Review** — anything missed in Quiz mode shows up here for extra drilling until answered correctly twice in a row.
 - **Reference** — full-text search across every item's ingredients, allergens, and flavour notes — handy as an actual on-shift lookup.
 
+## Problem reports
+
+The **Report** button in the header (plus "Report this question" after a quiz answer and "Something wrong here?" under Guests answers) opens a short form. It builds a plain-text report with the screen, the exact question/options or item, app version, device, and any recent JavaScript errors, then opens the phone's share sheet to text it over. Paste the report into a Claude Code session to get it fixed.
+
+When changing `app.js`/`style.css`/`data.js`, bump `APP_VERSION` in `app.js` and the `?v=` values in `index.html` so home-screen installs load the new files.
+
 ## Love notes
 
 When the app is opened from the home screen, a note from the raccoon (on behalf of the boyfriend) pops up now and then — at most about once a day and not every time. Tap the raccoon in the header 5 times quickly to get one on demand. Notes live in `LOVE_NOTES` in `app.js`.
