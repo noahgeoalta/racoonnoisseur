@@ -420,7 +420,7 @@
       ? (/cross/.test(allergenText(i)) ? 'Not listed, but cross-contamination noted — check with kitchen' : 'Not listed in allergens')
       : null;
   }
-  const nice = s => s.replace(/\b\w/g, c => c.toUpperCase());
+  const nice = s => s.replace(/(^|\s)(\S)/g, (m, sp, c) => sp + c.toUpperCase());
   // Match on the item name + ingredients only (blurbs say things like "anything but vodka").
   function find(re, pick = () => true) {
     return i => pick(i) && re.test(ing(i)) ? nice(ing(i).match(re)[0]) : null;
