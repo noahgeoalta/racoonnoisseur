@@ -1,6 +1,37 @@
 (function () {
   'use strict';
 
+
+  /* ============================ mascot ============================ */
+  const MASCOT = {
+    happy: 'img/face-happy.webp', laugh: 'img/face-laugh.webp', surprised: 'img/face-surprised.webp',
+    love: 'img/face-love.webp', notepad: 'img/notepad.webp', cloche: 'img/cloche.webp',
+    cheer: 'img/cheer.webp', pour: 'img/pour.webp', wave: 'img/wave.webp'
+  };
+  function mascot(pose, cls = '') {
+    return `<img class="mascot ${cls}" src="${MASCOT[pose]}" alt="" aria-hidden="true">`;
+  }
+  // A little waiter strolls across the bottom of the screen with a coffee.
+  function waiterStroll() {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const w = document.createElement('div');
+    w.className = 'walker walker-stroll';
+    w.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(w);
+    w.addEventListener('animationend', e => { if (e.animationName === 'stroll') w.remove(); });
+  }
+  (function initAvatar() {
+    const btn = document.getElementById('brand-avatar');
+    if (!btn) return;
+    const faces = ['laugh', 'love', 'surprised', 'happy'];
+    let i = 0;
+    btn.addEventListener('click', () => {
+      const img = btn.querySelector('img');
+      img.src = MASCOT[faces[i++ % faces.length]];
+      btn.classList.remove('boop'); void btn.offsetWidth; btn.classList.add('boop');
+    });
+  })();
+
   /* ============================ password gate ============================ */
   /* NOTE: this is a deterrent, not real security. This is a static site with no
      server — anyone who specifically requests data.js directly can still read the
@@ -269,7 +300,7 @@
 
     const total = studyState.order.length;
     if (total === 0) {
-      root.innerHTML = `<div class="empty-state">No items in this category.</div>`;
+      root.innerHTML = `<div class="empty-state">${mascot('notepad', 'mascot-md')}<div>No items in this category.</div></div>`;
       return;
     }
     if (studyState.index >= total) studyState.index = 0;
@@ -573,6 +604,7 @@
     quizState.selected = null;
     quizState.missedThisSession = [];
     quizState.phase = quizState.queue.length ? 'active' : 'empty';
+    if (quizState.queue.length) waiterStroll();
   }
 
   function renderQuiz() {
@@ -588,6 +620,7 @@
     root.innerHTML = `
       <div class="section-title">Quiz</div>
       <div class="quiz-setup-card">
+        ${mascot('notepad', 'mascot-md bob')}
         <h2>Pick Your Quiz</h2>
         <div class="section-title" style="text-align:left">Category</div>
         <div class="pill-row" id="quiz-cats">
@@ -616,7 +649,7 @@
   }
 
   function renderQuizEmpty() {
-    root.innerHTML = `<div class="empty-state">Couldn't build enough questions for that selection — try "All" categories.</div>
+    root.innerHTML = `<div class="empty-state">${mascot('surprised', 'mascot-md')}<div>Couldn't build enough questions for that selection — try "All" categories.</div></div>
       <button class="btn block" id="quiz-back">Back</button>`;
     document.getElementById('quiz-back').addEventListener('click', () => { quizState.phase = 'setup'; renderQuiz(); });
   }
@@ -664,7 +697,8 @@
     const fb = document.getElementById('quiz-feedback');
     fb.innerHTML = `
       <div class="quiz-feedback ${correct ? 'correct' : 'incorrect'}">
-        <b>${correct ? '✅ Correct!' : '❌ Not quite.'}</b><br>${escapeHtml(q.explanation)}
+        ${mascot(correct ? sample(['laugh', 'love', 'happy'], 1)[0] : 'surprised', 'mascot-fb ' + (correct ? 'pop' : 'shake'))}
+        <div><b>${correct ? 'Correct!' : 'Not quite.'}</b><br>${escapeHtml(q.explanation)}</div>
       </div>
       <button class="btn block" id="quiz-next" style="margin-top:14px">${quizState.index + 1 < quizState.queue.length ? 'Next Question ▶' : 'See Results'}</button>
     `;
@@ -683,6 +717,7 @@
     root.innerHTML = `
       <div class="quiz-summary">
         <div class="section-title">Quiz Complete</div>
+        ${mascot(pct >= 80 ? 'cheer' : pct >= 50 ? 'cloche' : 'pour', 'mascot-lg pop')}
         <div class="big-score">${quizState.score} / ${total}</div>
         <p style="color:var(--muted)">${pct}% — ${pct >= 80 ? "You're basically a menu savant 🦝" : pct >= 50 ? "Solid! A little more drilling and you've got it." : "Good start — let's review the misses."}</p>
         <button class="btn block" id="quiz-retry">Take Another Quiz</button>
@@ -701,7 +736,7 @@
     if (weak.length === 0) {
       root.innerHTML = `
         <div class="section-title">Review</div>
-        <div class="empty-state">No weak spots yet — take a quiz and anything you miss will show up here for extra drilling.</div>
+        <div class="empty-state">${mascot('wave', 'mascot-lg bob')}<div>No weak spots yet — take a quiz and anything you miss will show up here for extra drilling.</div></div>
       `;
       return;
     }
@@ -803,7 +838,7 @@
   // Each row is one item (wine / menu item / well liquor), read left to right through its
   // fields — matching the printed binder rather than a field-per-row / item-per-column grid.
   function renderPageTable(page) {
-    if (page.items.length === 0) return '<div class="empty-state">No items landed on this page.</div>';
+    if (page.items.length === 0) return `<div class="empty-state">${mascot('notepad', 'mascot-md')}<div>No items landed on this page.</div></div>`;
     const fields = page.type === 'liquors'
       ? [['brand', 'Brand']]
       : page.type === 'wine'
@@ -992,7 +1027,7 @@
       </div>
       <div class="progress-line">${items.length} item${items.length === 1 ? '' : 's'}</div>
       <div id="ref-list">
-        ${items.length === 0 ? '<div class="empty-state">No matches.</div>' : items.map(refItemHtml).join('')}
+        ${items.length === 0 ? `<div class="empty-state">${mascot('surprised', 'mascot-md')}<div>No matches.</div></div>` : items.map(refItemHtml).join('')}
       </div>
       ${anyEdits ? '<button class="btn secondary block" id="reset-all-edits" style="margin-top:6px">↺ Reset all corrections</button>' : ''}
     `;

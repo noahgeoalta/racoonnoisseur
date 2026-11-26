@@ -67,6 +67,7 @@ body {
 .gate-overlay.hidden { display: none; }
 
 .gate-card {
+  margin-top: 60px;
   width: 100%;
   max-width: 340px;
   text-align: center;
@@ -75,7 +76,7 @@ body {
   border-radius: var(--radius);
   padding: 32px 24px;
 }
-.gate-emoji { font-size: 40px; margin-bottom: 4px; }
+.gate-logo { display: block; width: 78%; max-width: 260px; height: auto; margin: -70px auto 6px; filter: drop-shadow(0 8px 18px rgba(0,0,0,.45)); animation: logo-in .7s cubic-bezier(.2,1.4,.4,1) both; }
 .gate-card h2 { color: var(--gold-bright); font-size: 22px; margin-bottom: 8px; }
 .gate-card p { color: var(--muted); font-size: 13px; margin: 0 0 18px; }
 .gate-card .search-input { text-align: center; margin-bottom: 12px; }
@@ -487,4 +488,52 @@ body {
 @media (min-width: 720px) {
   .view-root { padding-top: 24px; }
   .flip-card { min-height: 300px; }
+}
+
+/* ---------- Mascot & animation ---------- */
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.brand-avatar {
+  width: 46px; height: 46px; padding: 0; border-radius: 50%;
+  background: var(--cream); border: 2px solid var(--gold);
+  overflow: hidden; cursor: pointer; flex: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,.35);
+}
+.brand-avatar img { width: 100%; height: 100%; object-fit: contain; object-position: 50% 30%; transform: scale(1.12) translateY(3px); display: block; }
+.brand-avatar.boop { animation: boop .45s cubic-bezier(.3,1.6,.5,1); }
+
+.mascot { display: block; height: auto; margin: 0 auto; filter: drop-shadow(0 6px 12px rgba(0,0,0,.35)); }
+.mascot-md { width: 120px; margin-bottom: 10px; }
+.mascot-lg { width: 170px; margin: 6px auto 4px; }
+.empty-state .mascot { margin-bottom: 14px; }
+
+.quiz-feedback { display: flex; gap: 12px; align-items: flex-start; }
+.mascot-fb { width: 64px; flex: none; margin: 0; }
+
+.bob { animation: bob 2.6s ease-in-out infinite; }
+.pop { animation: pop .5s cubic-bezier(.2,1.6,.4,1) both; }
+.shake { animation: shake .45s ease-in-out both; }
+
+/* Walk cycle: 4-frame sprite strip (each frame 158×180) */
+.walker {
+  position: fixed; bottom: calc(52px + var(--safe-bottom)); left: 0;
+  width: 53px; height: 60px; z-index: 30; pointer-events: none;
+  background: url(img/walk.webp) 0 0 / 212px 60px no-repeat;
+}
+.walker-stroll { animation: walk .5s steps(4) infinite, stroll 5s linear forwards; }
+.gate-overlay .walker-loop { bottom: calc(18px + var(--safe-bottom)); animation: walk .5s steps(4) infinite, stroll 9s linear infinite; }
+
+@keyframes walk { to { background-position: -212px 0; } }
+.gate-overlay .walker-loop { width: 79px; height: 90px; background-size: 316px 90px; animation-name: walk-lg, stroll; }
+@keyframes walk-lg { to { background-position: -316px 0; } }
+@keyframes stroll { from { transform: translateX(-90px); } to { transform: translateX(calc(100vw + 10px)); } }
+@keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes pop { 0% { transform: scale(.4); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes shake { 0%,100% { transform: translateX(0); } 20%,60% { transform: translateX(-6px) rotate(-4deg); } 40%,80% { transform: translateX(6px) rotate(4deg); } }
+@keyframes boop { 0% { transform: scale(1); } 40% { transform: scale(1.18) rotate(-8deg); } 100% { transform: scale(1); } }
+@keyframes logo-in { from { transform: translateY(-14px) scale(.85); opacity: 0; } to { transform: none; opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .bob, .pop, .shake, .gate-logo, .brand-avatar.boop { animation: none !important; }
+  .walker { display: none; }
 }
