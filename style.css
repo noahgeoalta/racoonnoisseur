@@ -1,14 +1,15 @@
 :root {
-  --bg: #17130f;
-  --bg-elev: #211b15;
-  --bg-card: #2a231b;
-  --gold: #cda45e;
-  --gold-bright: #e8c27e;
-  --cream: #f3ead9;
-  --muted: #b6a892;
-  --green: #7fb069;
-  --red: #d9695f;
-  --border: #3a3025;
+  --bg: #2b1714;
+  --bg-elev: #3a201b;
+  --bg-card: #472822;
+  --gold: #d9a35b;
+  --gold-bright: #f4d9a6;
+  --cream: #f8ecd4;
+  --muted: #c9ac93;
+  --green: #8fbf73;
+  --red: #e2735f;
+  --border: #5a352d;
+  --script: 'Leckerli One', 'Brush Script MT', cursive;
   --radius: 14px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
@@ -31,7 +32,27 @@ body {
   min-height: 100vh;
 }
 
-h1, h2, h3 { font-family: Georgia, 'Times New Roman', serif; margin: 0; }
+h1, h2, h3 { font-family: 'Fraunces', Georgia, 'Times New Roman', serif; margin: 0; }
+
+body {
+  background:
+    radial-gradient(120% 60% at 50% -10%, #4a2620 0%, transparent 60%),
+    var(--bg);
+  background-attachment: fixed;
+}
+
+/* Wordmark — retro cream script with a dark outline, echoing the logo */
+.brand-text h1, .gate-card h2 {
+  font-family: var(--script) !important;
+  font-weight: 400;
+  color: var(--cream) !important;
+  letter-spacing: 0.5px;
+  -webkit-text-stroke: 1px #1a0d0b;
+  paint-order: stroke fill;
+  text-shadow: 0 2px 0 #1a0d0b, 0 3px 10px rgba(0,0,0,.35);
+}
+.brand-text h1 { font-size: 26px !important; line-height: 1.1; }
+.gate-card h2 { font-size: 34px !important; margin-bottom: 10px; }
 
 .gate-overlay {
   position: fixed;
