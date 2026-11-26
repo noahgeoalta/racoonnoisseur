@@ -6,8 +6,13 @@ A phone-friendly study tool for memorizing a restaurant's menu — wine list, co
 
 - **Study** — flip-card browsing of every wine, cocktail, and food item. Filter by category, shuffle order.
 - **Quiz** — multiple-choice questions styled after real guest questions ("what's in this?", "what pairs with that?", "what else is like this?", allergy checks). Pick a category and length.
+- **Guests** — type what a guest said ("I like martinis", "what's gluten free?") or tap a common question to see every matching item, why it matches, and which section of the menu to point to. **Practice** mode plays a random guest question to answer out loud before revealing the answer. Answers are computed live from `data.js`, so they stay current when the menu changes.
 - **Review** — anything missed in Quiz mode shows up here for extra drilling until answered correctly twice in a row.
 - **Reference** — full-text search across every item's ingredients, allergens, and flavour notes — handy as an actual on-shift lookup.
+
+## Love notes
+
+When the app is opened from the home screen, a note from the raccoon (on behalf of the boyfriend) pops up now and then — at most about once a day and not every time. Tap the raccoon in the header 5 times quickly to get one on demand. Notes live in `LOVE_NOTES` in `app.js`.
 
 ## Editing the menu data
 
