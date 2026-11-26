@@ -762,6 +762,11 @@
     return picked;
   }
 
+  const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+  // "the Heirloom", not "the The Heirloom".
+  const the = item => /^the /i.test(item.name) ? item.name : `the ${item.name}`;
+  const theName = item => /^the /i.test(item.name) ? `<b>${escapeHtml(item.name)}</b>` : `the <b>${escapeHtml(item.name)}</b>`;
+
   function buildMC(promptText, correctText, distractors, explanation) {
     if (distractors.length < 3) return null;
     const options = shuffle([{ text: correctText, correct: true }, ...distractors.slice(0, 3).map(d => ({ text: d, correct: false }))]);
@@ -769,12 +774,12 @@
   }
 
   function genComposition(item, pool) {
-    if (!item.composition) return null;
-    const distractors = pickSmartDistractors(item, pool, 'composition', 3);
+    if (!item.composition || thinText(item.composition) || leaksName(item, item.composition) || !quizzable(item)) return null;
+    const distractors = pickSmartDistractors(item, pool.filter(i => !leaksName(i, i.composition) && quizzable(i)), 'composition', 3);
     return buildMC(
-      `A guest asks what's in the <b>${escapeHtml(item.name)}</b>. What do you tell them?`,
+      `A guest asks what's in ${theName(item)}. What do you tell them?`,
       item.composition, distractors,
-      `The ${item.name} is made with: ${item.composition}`
+      `${cap(the(item))} is made with: ${item.composition}`
     );
   }
 
@@ -792,7 +797,7 @@
     if (item.category !== 'wine' || answerGivenAwayByName(item, item.varietal)) return null;
     const distractors = pickSmartDistractors(item, pool, 'varietal', 3);
     return buildMC(
-      `A guest asks what varietal the <b>${escapeHtml(item.name)}</b> is. What's the answer?`,
+      `A guest asks what varietal ${theName(item)} is. What's the answer?`,
       item.varietal, distractors,
       `${item.name} is a ${item.varietal} from ${item.region}.`
     );
@@ -802,19 +807,19 @@
     if (item.category !== 'wine' || !item.pairings) return null;
     const distractors = pickSmartDistractors(item, pool, 'pairings', 3);
     return buildMC(
-      `A guest orders the <b>${escapeHtml(item.name)}</b>. What does the menu recommend pairing it with?`,
+      `A guest orders ${theName(item)}. What does the menu recommend pairing it with?`,
       item.pairings, distractors,
       `${item.name} pairs with: ${item.pairings}`
     );
   }
 
   function genAllergen(item, pool) {
-    if (!item.allergens || item.allergens === 'N/A') return null;
-    const KEYWORDS = ['gluten', 'dairy', 'egg', 'nuts', 'nut', 'shellfish', 'seafood', 'soy', 'garlic', 'nightshade', 'sesame', 'pork', 'fish', 'cilantro', 'tannins', 'caffeine', 'honey'];
+    if (!item.allergens || item.allergens === 'N/A' || !quizzable(item)) return null;
+    const KEYWORDS = shuffle(['gluten', 'dairy', 'egg', 'nut', 'shellfish', 'seafood', 'soy', 'nightshade', 'sesame', 'pork', 'fish', 'cilantro', 'caffeine', 'alcohol']);
     const lower = item.allergens.toLowerCase();
-    const found = KEYWORDS.find(k => lower.includes(k));
+    const found = KEYWORDS.find(k => lower.includes(k) && !leaksName(item, k));
     if (!found) return null;
-    const eligiblePool = pool.filter(i => i.id !== item.id && i.allergens);
+    const eligiblePool = pool.filter(i => i.id !== item.id && i.allergens && quizzable(i) && i.allergens !== 'N/A');
     const safe = eligiblePool.filter(i => !i.allergens.toLowerCase().includes(found));
     if (safe.length < 3) return null;
     // Prefer distractors from the same category (a guest asking about a cocktail is more
@@ -823,30 +828,147 @@
     const distractorPool = safeSameCat.length >= 3 ? safeSameCat : safe;
     const distractors = sample(distractorPool, 3).map(i => i.name);
     return buildMC(
-      `A guest has a <b>${found}</b> allergy or sensitivity. Which of these should you flag as a problem?`,
+      `A guest ${found === 'alcohol' ? "can't have <b>alcohol</b> (even cooked in)" : found === 'caffeine' ? 'is avoiding <b>caffeine</b>' : `has ${/^[aeiou]/.test(found) ? 'an' : 'a'} <b>${found}</b> allergy`}. Which of these should you flag?`,
       item.name, distractors,
       `${item.name} contains: ${item.allergens}`
     );
   }
 
   function genPreset(item, pool) {
-    if (!item.preset || item.preset === 'N/A') return null;
+    if (!item.preset || item.preset === 'N/A' || item.preset.length < 25 || leaksName(item, item.preset) || !quizzable(item)) return null;
     const distractors = pickSmartDistractors(item, pool, 'preset', 3);
     return buildMC(
-      `How is the <b>${escapeHtml(item.name)}</b> served or garnished?`,
+      `How is ${theName(item)} served or garnished?`,
       item.preset, distractors,
       `${item.name}: ${item.preset}`
     );
   }
 
+  // Words from an item's name that would give the answer away if they appear in a clue.
+  const NAME_STOP = new Set(['the', 'and', 'with', 'house', 'barbaretta', 'your', 'if', 'you', 'please', 'wine', 'company', 'estate', 'vineyard']);
+  function nameWords(item) {
+    return item.name.toLowerCase().replace(/\([^)]*\)/g, ' ').split(/[^a-zà-ÿ']+/).map(w => w.replace(/'s$|'/g, ''))
+      .filter(w => w.length >= 3 && !NAME_STOP.has(w))
+      .map(w => w.replace(/s$/, ''));
+  }
+  function leaksName(item, text) {
+    const t = String(text || '').toLowerCase();
+    return nameWords(item).some(w => t.includes(w));
+  }
+  const thinText = t => !t || t.length < 45 || /ask for details|^add-on\.?$|rotates/i.test(t);
+  // Items that can't be quizzed meaningfully (e.g. the rotating soup).
+  const quizzable = i => !/ask for details/i.test(i.allergens || '') && !/rotates/i.test(i.composition || '');
+
+  function ingredientsOf(item) {
+    if (!item.composition) return [];
+    return item.composition.toLowerCase().replace(/\([^)]*\)/g, '').replace(/\.$/, '')
+      .split(/,|;| and (?=[a-z])/).map(s => s.replace(/^(and|with)\s+/, '').trim())
+      .filter(s => s.length >= 3);
+  }
+  // Ingredients that set this item apart: not a generic (lime juice, simple syrup…),
+  // not appearing in other items of the same category, and not part of the item's name.
+  const GENERIC_ING = /^(herbs|thyme|pepper|shallots|onion|cream|tomato|no tail|.*\d.*|lime juice|lemon juice|simple syrup|soda|soda water|saline solution|garlic|salt|kosher salt|black pepper|pepper|egg whites?|cilantro|baby greens|butter|potato|naan|orange)$/;
+  function distinctiveIngredients(item, pool) {
+    const others = pool.filter(i => i.id !== item.id && i.category === item.category).map(i => (i.composition || '').toLowerCase());
+    return ingredientsOf(item).filter(ing => !GENERIC_ING.test(ing) && !leaksName(item, ing) && !others.some(o => o.includes(ing)));
+  }
+
+  function genIngredientIn(item, pool) {
+    if (item.category === 'wine' || !quizzable(item)) return null;
+    const mine = distinctiveIngredients(item, pool);
+    if (!mine.length) return null;
+    const answer = sample(mine, 1)[0];
+    const comp = item.composition.toLowerCase();
+    const sameSub = pool.filter(i => i.id !== item.id && i.category === item.category && i.subcategory === item.subcategory);
+    const sameCat = pool.filter(i => i.id !== item.id && i.category === item.category);
+    let others = [...new Set(sameSub.flatMap(i => distinctiveIngredients(i, pool)))].filter(x => !comp.includes(x));
+    if (others.length < 3) others = [...new Set(sameCat.flatMap(i => distinctiveIngredients(i, pool)))].filter(x => !comp.includes(x));
+    const distractors = sample(others, 3);
+    return buildMC(
+      `Which of these is <b>in</b> ${theName(item)}?`,
+      cap(answer), distractors.map(cap),
+      `${cap(the(item))} is made with: ${item.composition}`
+    );
+  }
+
+  function genIngredientNotIn(item, pool) {
+    if (item.category === 'wine' || !quizzable(item)) return null;
+    const mine = ingredientsOf(item).filter(x => !GENERIC_ING.test(x) && !leaksName(item, x));
+    if (mine.length < 3) return null;
+    const comp = item.composition.toLowerCase();
+    const near = pool.filter(i => i.id !== item.id && i.category === item.category && i.subcategory === item.subcategory);
+    const sameCat = pool.filter(i => i.id !== item.id && i.category === item.category);
+    const fromPool = list => [...new Set(list.flatMap(i => distinctiveIngredients(i, pool)))].filter(x => !comp.includes(x));
+    const outsider = sample(fromPool(near).length ? fromPool(near) : fromPool(sameCat), 1)[0];
+    if (!outsider) return null;
+    return buildMC(
+      `Which of these is <b>NOT</b> in ${theName(item)}?`,
+      cap(outsider), sample(mine, 3).map(cap),
+      `${cap(the(item))} is made with: ${item.composition}`
+    );
+  }
+
+  function genNameFromIngredients(item, pool) {
+    if (item.category === 'wine' || !quizzable(item)) return null;
+    const mine = distinctiveIngredients(item, pool);
+    if (mine.length < 2) return null;
+    const clue = sample(mine, Math.min(3, mine.length));
+    const distractors = pickSmartDistractors(item, pool.filter(quizzable), 'name', 3);
+    const noun = item.category === 'food' ? 'dish' : item.subcategory === 'mocktail' ? 'mocktail' : 'drink';
+    return buildMC(
+      `A guest wants "the ${noun} with <b>${clue.map(escapeHtml).join('</b> and <b>')}</b>". Which one is that?`,
+      item.name, distractors,
+      `That's ${the(item)}: ${item.composition}`
+    );
+  }
+
+  const SPIRITS = [
+    ['Bourbon / whiskey', /bourbon|whiskey|woodford|elijah craig|brothers bond|\brye\b/],
+    ['Tequila', /tequila|cimarron|cimmaron|reposado|blanco/],
+    ['Gin', /\bgin\b/], ['Vodka', /vodka/], ['Rum', /\brum\b|brum/], ['Wine / port', /white port|white wine|red wine|cabernet|rosé wine/]
+  ];
+  function genBaseSpirit(item) {
+    if (item.category !== 'cocktail' || item.subcategory === 'mocktail') return null;
+    const comp = (item.composition || '').toLowerCase();
+    const hit = SPIRITS.find(([, re]) => re.test(comp));
+    if (!hit || leaksName(item, hit[0].split(' ')[0])) return null;
+    return buildMC(
+      `What's the <b>base spirit</b> in ${theName(item)}?`,
+      hit[0], sample(SPIRITS.filter(s => s !== hit).map(s => s[0]), 3),
+      `${cap(the(item))} is made with: ${item.composition}`
+    );
+  }
+
+  // Real guest scenarios, reusing the Guests-tab logic: pick an item that genuinely fits
+  // the request, with wrong answers that clearly don't (allergen listed / doesn't match).
+  const ALLERGY_TOPICS = { gluten: 'gluten', dairy: 'dairy', nut: 'nut', egg: 'egg' };
+  function genGuestScenario(item, pool) {
+    if (item.category === 'wine' || !quizzable(item)) return null;
+    const fits = shuffle(GUEST_TOPICS.filter(t => !['share', 'dessert', 'popular', 'light-white', 'bold-red'].includes(t.id)))
+      .filter(t => { const w = t.match(item); return w && !/cross-contamination/.test(w); });
+    for (const t of fits) {
+      const sameCat = pool.filter(i => i.id !== item.id && i.category === item.category && quizzable(i));
+      const allergen = ALLERGY_TOPICS[t.id];
+      const wrong = sameCat.filter(i => allergen ? new RegExp(allergen, 'i').test(i.allergens || '') : !t.match(i));
+      if (wrong.length < 3) continue;
+      const kind = item.category === 'food' ? (item.subcategory === 'sauce' ? 'add-on' : 'dish') : 'drink';
+      const ask = allergen
+        ? `A guest has ${/^[aeiou]/.test(allergen) ? 'an' : 'a'} <b>${allergen} allergy</b> and wants ${/^[aeiou]/.test(kind) ? 'an' : 'a'} ${kind}. Which one is safe to suggest?`
+        : `A guest says: <i>"${escapeHtml(t.quotes[0])}"</i> Which of these fits best?`;
+      return buildMC(ask, item.name, sample(wrong, 3).map(i => i.name),
+        allergen ? `${item.name} lists: ${item.allergens}. (Always confirm serious allergies with the kitchen.)` : `${item.name} — ${t.match(item)}. ${t.tip || ''}`);
+    }
+    return null;
+  }
+
   function genNameFromBlurb(item, pool) {
-    if (!item.blurb) return null;
+    if (!item.blurb || thinText(item.blurb) || leaksName(item, item.blurb) || !quizzable(item)) return null;
     const distractors = pickSmartDistractors(item, pool, 'name', 3);
     if (distractors.length < 3) return null;
     return buildMC(
       `Which item matches this description? <br><i>"${escapeHtml(item.blurb)}"</i>`,
       item.name, distractors,
-      `That's the ${item.name}.`
+      `That's ${the(item)}.`
     );
   }
 
@@ -862,7 +984,7 @@
     const correct = sample(alike, 1)[0];
     const distractors = sample(different, 3).map(i => i.name);
     return buildMC(
-      `A guest loved the <b>${escapeHtml(item.name)}</b>. Based on flavour, what else on the menu might they enjoy?`,
+      `A guest loved ${theName(item)}. Based on flavour, what else on the menu might they enjoy?`,
       correct.name, distractors,
       `${correct.name} shares similar flavour notes (${correct.tags.filter(t => item.tags.includes(t)).join(', ')}) with the ${item.name}.`
     );
@@ -879,7 +1001,7 @@
     if (distractorPool.length < 3) return null;
     const distractors = sample(distractorPool, 3).map(i => i.name);
     return buildMC(
-      `A guest orders the <b>${escapeHtml(item.name)}</b>. Which dish on the menu would you recommend pairing it with?`,
+      `A guest orders ${theName(item)}. Which dish on the menu would you recommend pairing it with?`,
       correct.name, distractors,
       `${item.name} pairs with: ${item.pairings}`
     );
@@ -894,16 +1016,16 @@
     if (distractorPool.length < 3) return null;
     const distractors = sample(distractorPool, 3).map(i => i.name);
     return buildMC(
-      `A guest orders the <b>${escapeHtml(item.name)}</b>. Which wine on the list would you recommend pairing it with?`,
+      `A guest orders ${theName(item)}. Which wine on the list would you recommend pairing it with?`,
       correct.name, distractors,
       `${correct.name} pairs with: ${correct.pairings}`
     );
   }
 
   const GENERATORS_BY_CATEGORY = {
-    wine: [genWineVarietal, genWinePairing, genWineFoodPairing, genNameFromBlurb, genFlavorAlike],
-    cocktail: [genComposition, genAllergen, genPreset, genNameFromBlurb, genFlavorAlike],
-    food: [genComposition, genAllergen, genPreset, genFoodWinePairing, genNameFromBlurb, genFlavorAlike]
+    wine: [genWineVarietal, genWinePairing, genWineFoodPairing, genNameFromBlurb],
+    cocktail: [genIngredientIn, genIngredientNotIn, genNameFromIngredients, genBaseSpirit, genGuestScenario, genAllergen, genPreset, genComposition, genNameFromBlurb],
+    food: [genIngredientIn, genIngredientNotIn, genNameFromIngredients, genGuestScenario, genAllergen, genPreset, genFoodWinePairing, genComposition, genNameFromBlurb]
   };
 
   function generateQuestionForItem(item, pool) {

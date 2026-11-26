@@ -53,7 +53,7 @@ const WINES = [
     varietal: 'Pinot Grigio (skin-contact)',
     region: 'Veneto, Italy',
     blurb: 'Peach, apricot, orange peel, wild herbs — more texture than a traditional Pinot Grigio because the skin stays on the grape longer (gives it the pink/"ramato" color).',
-    pairings: 'Burrata, roasted vegetables, grilled chicken, pork, salmon, linguini.',
+    pairings: 'Roasted vegetables, grilled chicken, pork, salmon.',
     tags: ['stone-fruit', 'orange-wine', 'herbal', 'textured']
   },
   {
@@ -101,7 +101,7 @@ const WINES = [
     varietal: 'Moschofilero',
     region: 'Peloponnese, Greece',
     blurb: 'Floral and aromatic. Rose petals, citrus blossom, peach, lemon zest with a crisp, delicate finish. (Dry Dry)',
-    pairings: 'Seafood, salads, hummus, feta, grilled vegetables, chicken, Dip Trio, Chicken & Risotto',
+    pairings: 'Seafood, salads, hummus, feta, grilled vegetables, chicken.',
     tags: ['floral', 'stone-fruit', 'citrus', 'crisp']
   },
   {
